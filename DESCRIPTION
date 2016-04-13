@@ -11,3 +11,5 @@ LazyData: TRUE
 Suggests:
     INLA
 RoxygenNote: 5.0.1
+URL: http://github.com/julianfaraway/brinla
+BugReports: http://github.com/julianfaraway/brinla/issues
