@@ -1,0 +1,13 @@
+Package: brinla
+Type: Package
+Title: Bayesian Regression with INLA
+Version: 0.1.0
+Author: Julian Faraway <julian.faraway@gmail.com>
+Maintainer: Julian Faraway <julian.faraway@gmail.com>
+Description: Data and code to support a forthcoming book regarding Bayesian
+    regression models using INLA
+License: GPL-2
+LazyData: TRUE
+Suggests:
+    INLA
+RoxygenNote: 5.0.1
