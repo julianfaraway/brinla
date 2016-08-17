@@ -3,11 +3,11 @@
 \docType{data}
 \name{reeds}
 \alias{reeds}
-\title{Fowlmere reeds Data}
+\title{Fowlmere reeds data}
 \format{A data frame with 2 columns and 14 rows. The columns are:
 \itemize{
-\item{site}{A (factor) label identifying the site.}
-\item{nitrogen}{nitrogen content as a percentage.}}}
+\item{site}{ A (factor) label identifying the site.}
+\item{nitrogen}{ content as a percentage.}}}
 \usage{
 data(reeds)
 }
