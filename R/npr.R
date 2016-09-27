@@ -1,4 +1,3 @@
-
 #' Adaptive prior
 #'
 #' @param x
