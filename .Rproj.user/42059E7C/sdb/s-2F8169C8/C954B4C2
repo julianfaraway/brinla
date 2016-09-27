@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Bayes Linear Model\n#'\n#' Fits a Bayes Linear Model using direct sampling\n#'\n#' @param lmfit a linear model object returned by \\code{\"lm\"}\n#' @param B number of samples to generate\n#'\n#' @return A list with the elements\n#' \\itemize{\n#' \\item{post.dist}{data frame containing samples from the posterior of the parameters.}\n#' \\item{summary.stat}{summary statistics for the posterior samples}\n#' }\n#'\n#' @examples\n#' cars.lm <- lm(dist ~ speed, data=cars)\n#' set.seed(1)\n#' cars.blm <- BayesLM.nprior(cars.lm,10000)\n#'\n#' @export\nBayesLM.nprior <- function(lmfit, B){\n  require(MASS)\n  QR <- lmfit$qr\n  df.res <- lmfit$df.residual\n  V <- qr.R(QR)\n  coef <- lmfit$coef\n  Vb<- chol2inv(V)\n  s2 <- (t(lmfit$residuals)%*%lmfit$residuals)\n  s2<- s2[1,1]/df.res\n  sigma2 <- df.res * s2/rchisq(B,df.res)\n  coef.post <- data.frame(t(sapply(sigma2,function(x) mvrnorm(1,coef,Vb*x))))\n  post.dist <- data.frame(coef.post, sigma = sqrt(sigma2))\n  names(post.dist) <- c(names(lmfit$coef), \"sigma\")\n  summary.post <- t(apply(post.dist, 2, function(x)\n  {\n    c(\"mean\"=mean(x),\n      \"se\"=sd(x),\n      \"0.025quant\"=quantile(x,prob=0.025),\n      \"median\"=median(x),\n      \"0.975quant\"=quantile(x,prob=0.975))\n  }))\n  print(summary.post)\n  return(list(post.dist=post.dist, summary.stat = summary.post))\n}\n",
+    "created" : 1474969090469.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1283541663",
+    "id" : "C954B4C2",
+    "lastKnownWriteTime" : 1460559663,
+    "last_content_update" : 1460559663,
+    "path" : "~/publish/brinla/brinla/R/BayesLM.nprior.R",
+    "project_path" : "R/BayesLM.nprior.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

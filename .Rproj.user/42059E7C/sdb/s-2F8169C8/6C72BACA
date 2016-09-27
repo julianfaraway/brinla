@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : ".Rproj.user\n.Rhistory\n.RData\n.Ruserdata\nbrinla.Rproj\n.gitignore\n.Rbuildignore\n",
+    "created" : 1473430940823.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2754480504",
+    "id" : "6C72BACA",
+    "lastKnownWriteTime" : 1474968770,
+    "last_content_update" : 1474968770490,
+    "path" : "~/publish/brinla/brinla/.gitignore",
+    "project_path" : ".gitignore",
+    "properties" : {
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "gitignore"
+}

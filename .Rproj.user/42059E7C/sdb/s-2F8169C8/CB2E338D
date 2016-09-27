@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "Package: brinla\nType: Package\nTitle: Bayesian Regression with INLA\nVersion: 0.1.0\nAuthor: Julian Faraway <julian.faraway@gmail.com>, Ryan Yue <yu.yue@baruch.cuny.edu>\nMaintainer: Julian Faraway <julian.faraway@gmail.com>\nDescription: Data and code to support a forthcoming book regarding Bayesian\n    regression models using INLA\nLicense: GPL-2\nLazyData: TRUE\nSuggests:\n    INLA\nRoxygenNote: 5.0.1\nURL: http://github.com/julianfaraway/brinla\nBugReports: http://github.com/julianfaraway/brinla/issues\n",
+    "created" : 1471250797951.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3228483343",
+    "id" : "CB2E338D",
+    "lastKnownWriteTime" : 1474969438,
+    "last_content_update" : 1474969438204,
+    "path" : "~/publish/brinla/brinla/DESCRIPTION",
+    "project_path" : "DESCRIPTION",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "dcf"
+}
