@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 brinla.Rproj
+.gitignore
+.Rbuildignore
