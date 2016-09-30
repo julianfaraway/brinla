@@ -87,56 +87,74 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
 #' @return
 #' @export
 
-bri.band.ggplot <- function(result, name = NULL, alpha = 0.05, ind = NULL, type = c('random','fitted','linear'), xlab = NULL, ylab = NULL, main = NULL,  hpd = FALSE, plot.data = FALSE)
+## Function to plot credible band for nonlinear function
+
+bri.band.ggplot <- function(result, name = NULL, alpha = 0.05, ind = NULL, type = c('random', 'fitted', 'linear'), xlab = NULL, ylab = NULL, main = NULL,  hpd = FALSE)
 {
-	result
-	if(type == 'random'){
-		post.summary <- result$summary.random[[name]][ind,]
-		marg <- result$marginals.random[[name]][ind]
-	}
-	if(type == 'fitted'){
-		post.summary <- result$summary.fitted.values[ind,]
-		marg <- result$marginals.fitted.values[ind]
-	}
-	if(type == 'linear'){
-		post.summary <- result$summary.linear.predictor[ind,]
-		marg <- result$marginals.linear.predictor[ind]
-	}
-	if(hpd == TRUE){
-		 pp <- 1 - alpha
-		 tmp <- sapply(marg, function(x) inla.hpdmarginal(pp, x))
-		 fhat.lb <- tmp[1,]
-		 fhat.ub <- tmp[2,]
-	} else{
-		p.min <- alpha/2
-		p.max <- 1 - alpha/2
-		fhat.lb <- sapply(marg, function(x) inla.qmarginal(p.min, x))
-		fhat.ub <- sapply(marg, function(x) inla.qmarginal(p.max, x))
-		fhat.lb <- as.vector(fhat.lb)
-		fhat.ub <- as.vector(fhat.ub)
-	}
-
-	require(ggplot2,quietly = TRUE)
-
-	fhat <- post.summary$mean
-	if(is.null(name) == FALSE){
-		xx <- result$summary.random[[name]]$ID
-	}else{
-		xx <- 1:length(fhat)
-	}
-	data.plot <- data.frame(x = xx, fhat = fhat, f.lb = fhat.lb, f.ub = fhat.ub)
-
-	# if(plot.data == TRUE){
-		# p <- ggplot()
-	# }
-	ggplot(data.plot, aes(x = x)) +
-		geom_line(aes(y = fhat)) +
-		geom_ribbon(aes(ymin = f.lb, ymax = f.ub), alpha = 0.2) +
- 		theme_bw(base_size = 20) + labs(x = xlab, y = ylab) +
- 		ggtitle(main)
- }
-
-#' Plot credible band for nonlinear functionTitle
+  result
+  
+  if(is.null(ind) == TRUE){
+    if(type == 'random'){
+      post.summary <- result$summary.random[[name]]
+      marg <- result$marginals.random[[name]]
+    }
+    if(type == 'fitted'){
+      post.summary <- result$summary.fitted.values
+      marg <- result$marginals.fitted.values
+    }
+    if(type == 'linear'){
+      post.summary <- result$summary.linear.predictor
+      marg <- result$marginals.linear.predictor
+    }	
+  }else{
+    if(type == 'random'){
+      post.summary <- result$summary.random[[name]][ind,]
+      marg <- result$marginals.random[[name]][ind]
+    }
+    if(type == 'fitted'){
+      post.summary <- result$summary.fitted.values[ind,]
+      marg <- result$marginals.fitted.values[ind]
+    }
+    if(type == 'linear'){
+      post.summary <- result$summary.linear.predictor[ind,]
+      marg <- result$marginals.linear.predictor[ind]
+    }
+  }	
+  
+  
+  if(hpd == TRUE){
+    pp <- 1 - alpha
+    tmp <- sapply(marg, function(x) inla.hpdmarginal(pp, x))
+    fhat.lb <- tmp[1,]
+    fhat.ub <- tmp[2,]
+  } else{
+    p.min <- alpha/2
+    p.max <- 1 - alpha/2
+    fhat.lb <- sapply(marg, function(x) inla.qmarginal(p.min, x))
+    fhat.ub <- sapply(marg, function(x) inla.qmarginal(p.max, x))
+    fhat.lb <- as.vector(fhat.lb)
+    fhat.ub <- as.vector(fhat.ub)
+  }
+  
+  library(ggplot2)
+  
+  fhat <- post.summary$mean	
+  
+  if(is.null(name) == FALSE){
+    xx <- result$summary.random[[name]]$ID
+  }else{
+    xx <- 1:length(fhat)	
+  }
+  data.plot <- data.frame(x = xx, fhat = fhat, f.lb = fhat.lb, f.ub = fhat.ub)
+  
+  
+  ggplot(data.plot, aes(x = x)) +
+    geom_line(aes(y = fhat)) +
+    geom_ribbon(aes(ymin = f.lb, ymax = f.ub), alpha = 0.2) +
+    theme_bw(base_size = 20) + labs(x = xlab, y = ylab) + 
+    ggtitle(main)
+}
+#' Plot credible band for nonlinear function
 #'
 #' @param result
 #' @param name
@@ -153,50 +171,70 @@ bri.band.ggplot <- function(result, name = NULL, alpha = 0.05, ind = NULL, type 
 #'
 #' @return
 #' @export
-bri.band.plot <- function(result, name = NULL, alpha = 0.05, ind = NULL, xlab = NULL, ylab = NULL, main = NULL, sub = NULL, xlim = NULL, ylim = NULL, type = c('random','fitted','linear'), hpd = FALSE)
+bri.band.plot <- function(result, name = NULL, alpha = 0.05, ind = NULL, xlab = NULL, ylab = NULL, main = NULL, sub = NULL, xlim = NULL, ylim = NULL, type = c('random', 'fitted', 'linear'), hpd = FALSE)
 {
-	result
-	if(type == 'random'){
-		post.summary <- result$summary.random[[name]][ind,]
-		marg <- result$marginals.random[[name]][ind]
-	}
-	if(type == 'fitted'){
-		post.summary <- result$summary.fitted.values[ind,]
-		marg <- result$marginals.fitted.values[ind]
-	}
-	if(type == 'linear'){
-		post.summary <- result$summary.linear.predictor[ind,]
-		marg <- result$marginals.linear.predictor[ind]
-	}
-	if(hpd == TRUE){
-		 pp <- 1 - alpha
-		 tmp <- sapply(marg, function(x) inla.hpdmarginal(pp, x))
-		 fhat.lb <- tmp[1,]
-		 fhat.ub <- tmp[2,]
-	} else{
-		p.min <- alpha/2
-		p.max <- 1 - alpha/2
-		fhat.lb <- sapply(marg, function(x) inla.qmarginal(p.min, x))
-		fhat.ub <- sapply(marg, function(x) inla.qmarginal(p.max, x))
-		fhat.lb <- as.vector(fhat.lb)
-		fhat.ub <- as.vector(fhat.ub)
-	}
-	fhat <- post.summary$mean
-
-	if(is.null(name) == FALSE){
-		xx <- result$summary.random[[name]]$ID
-	}else{
-		xx <- 1:length(fhat)
-	}
-	if(is.null(ylim) == TRUE) {
-		ylim <- c(min(fhat.lb), max(fhat.ub))
-	}
-	plot(xx, fhat, ylab = ylab, xlab = xlab, main = main, sub = sub,
-	     cex.lab = 1.5, cex.axis = 1.5, xlim = xlim, ylim = ylim, type = 'n')
-	lines(xx, fhat, lwd = 1.2)
-	lines(xx, fhat.lb, lwd = 1.2, lty = 2)
-	lines(xx, fhat.ub, lwd = 1.2, lty = 2)
+  result
+  
+  if(is.null(ind) == TRUE){
+    if(type == 'random'){
+      post.summary <- result$summary.random[[name]]
+      marg <- result$marginals.random[[name]]
+    }
+    if(type == 'fitted'){
+      post.summary <- result$summary.fitted.values
+      marg <- result$marginals.fitted.values
+    }
+    if(type == 'linear'){
+      post.summary <- result$summary.linear.predictor
+      marg <- result$marginals.linear.predictor
+    }	
+  }else{
+    if(type == 'random'){
+      post.summary <- result$summary.random[[name]][ind,]
+      marg <- result$marginals.random[[name]][ind]
+    }
+    if(type == 'fitted'){
+      post.summary <- result$summary.fitted.values[ind,]
+      marg <- result$marginals.fitted.values[ind]
+    }
+    if(type == 'linear'){
+      post.summary <- result$summary.linear.predictor[ind,]
+      marg <- result$marginals.linear.predictor[ind]
+    }
+  }	
+  
+  
+  if(hpd == TRUE){
+    pp <- 1 - alpha
+    tmp <- sapply(marg, function(x) inla.hpdmarginal(pp, x))
+    fhat.lb <- tmp[1,]
+    fhat.ub <- tmp[2,]
+  } else{
+    p.min <- alpha/2
+    p.max <- 1 - alpha/2
+    fhat.lb <- sapply(marg, function(x) inla.qmarginal(p.min, x))
+    fhat.ub <- sapply(marg, function(x) inla.qmarginal(p.max, x))
+    fhat.lb <- as.vector(fhat.lb)
+    fhat.ub <- as.vector(fhat.ub)
+  }	
+  
+  fhat <- post.summary$mean	
+  
+  if(is.null(name) == FALSE){
+    xx <- result$summary.random[[name]]$ID
+  }else{
+    xx <- 1:length(fhat)	
+  }
+  if(is.null(ylim) == TRUE) {
+    ylim <- c(min(fhat.lb), max(fhat.ub))
+  }
+  plot(xx, fhat, ylab = ylab, xlab = xlab, main = main, sub = sub, 
+       cex.lab = 1.5, cex.axis = 1.5, xlim = xlim, ylim = ylim, type = 'n')	
+  lines(xx, fhat, lwd = 1.2)
+  lines(xx, fhat.lb, lwd = 1.2, lty = 2)
+  lines(xx, fhat.ub, lwd = 1.2, lty = 2)
 }
+
 #' TPS Prior
 #'
 #' @param mesh
