@@ -136,7 +136,7 @@ bri.band.ggplot <- function(result, name = NULL, alpha = 0.05, ind = NULL, type 
     fhat.ub <- as.vector(fhat.ub)
   }
   
-  library(ggplot2)
+  require(ggplot2)
   
   fhat <- post.summary$mean	
   
