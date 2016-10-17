@@ -1,10 +1,10 @@
-#' tooth24
+#' larynx
 #'
 #' The dataset is 
 #'
 #' @docType data
 #'
-#' @usage data(tooth24)
+#' @usage data(larynx)
 #'
 #' @format The ohio data frame has 2148 rows and 4 columns
 #' \itemize{
@@ -19,6 +19,6 @@
 #' @references here
 #'
 #' @examples
-#' data(tooth24)
+#' data(larynx)
 #'
-"tooth24"
+"larynx"

@@ -2,7 +2,7 @@
 % Please edit documentation in R/npr.R
 \name{bri.band.plot}
 \alias{bri.band.plot}
-\title{Plot credible band for nonlinear functionTitle}
+\title{Plot credible band for nonlinear function}
 \usage{
 bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL,
   xlab = NULL, ylab = NULL, main = NULL, sub = NULL, xlim = NULL,
@@ -12,6 +12,6 @@ bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL,
 \item{hpd}{}
 }
 \description{
-Plot credible band for nonlinear functionTitle
+Plot credible band for nonlinear function
 }
 

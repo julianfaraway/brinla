@@ -6,7 +6,7 @@
 \usage{
 bri.band.ggplot(result, name = NULL, alpha = 0.05, ind = NULL,
   type = c("random", "fitted", "linear"), xlab = NULL, ylab = NULL,
-  main = NULL, hpd = FALSE, plot.data = FALSE)
+  main = NULL, hpd = FALSE)
 }
 \arguments{
 \item{plot.data}{}
