@@ -179,38 +179,6 @@ bri.band.ggplot <- function(result, name = NULL, alpha = 0.05, ind = NULL, type 
 #'
 #' @return
 #' @export
-bri.band.plot <- 
-  function (result, name = NULL, alpha = 0.05, ind = NULL, xlab = NULL, 
-            ylab = NULL, main = NULL, sub = NULL, xlim = NULL, ylim = NULL, cex.lab = 1.25,
-            cex.axis = 1.25, type = c("random", "fitted", "linear"), hpd = FALSE, ...) 
-  {
-    result
-    if (is.null(ind) == TRUE) {
-      if (type == "random") {
-        post.summary <- result$summary.random[[name]]
-        marg <- result$marginals.random[[name]]
-      }
-      if (type == "fitted") {
-        post.summary <- result$summary.fitted.values
-        marg <- result$marginals.fitted.values
-      }
-      if (type == "linear") {
-        post.summary <- result$summary.linear.predictor
-        marg <- result$marginals.linear.predictor
-      }
-    }
-    else {
-      if (type == "random") {
-        post.summary <- result$summary.random[[name]][ind, 
-                                                      ]
-        marg <- result$marginals.random[[name]][ind]
-      }
-      if (type == "fitted") {
-        post.summary <- result$summary.fitted.values[ind, 
-                                                     ]
-        marg <- result$marginals.fitted.values[ind]
-      }
-	    
 	    
 bri.band.plot <- function(result, name = NULL, alpha = 0.05, ind = NULL, xlab = NULL, ylab = NULL, main = NULL, sub = NULL, xlim = NULL, ylim = NULL, cex.lab = 1.5, cex.axis = 1.5, type = c('random', 'fitted', 'linear'), hpd = FALSE)
 {
@@ -340,6 +308,15 @@ excursions.brinla <- function(result.inla, name=NULL,
 }
 
 				  
+#' Excursions
+#'
+#' @param res.exc 
+#' @param xlab 
+#' @param ylab 
+#' @param main 
+#'
+#' @return
+#' @export
 bri.excursions.ggplot <- function(res.exc, xlab = NULL, ylab = NULL, main = NULL)
 {
 	res.exc
@@ -384,6 +361,28 @@ map.munich = function(results, ...)
 }
 
 
+#' Draw map
+#'
+#' @param data 
+#' @param map 
+#' @param regionvar 
+#' @param plotvar 
+#' @param limits 
+#' @param cols 
+#' @param nrcolors 
+#' @param swapcolors 
+#' @param pcat 
+#' @param hcl.par 
+#' @param hsv.par 
+#' @param legend 
+#' @param drawnames 
+#' @param cex.names 
+#' @param cex.legend 
+#' @param mar.min 
+#' @param ... 
+#'
+#' @return
+#' @export
 my.drawmap = function (data, map, regionvar = 2, plotvar = 3, limits, cols = "grey", 
     nrcolors = 100, swapcolors = TRUE, pcat = FALSE, hcl.par = list(h = c(130, 
         25), c = 100, l = c(90, 70)), hsv.par = list(s = 1, v = 1), 
@@ -607,6 +606,10 @@ my.drawmap = function (data, map, regionvar = 2, plotvar = 3, limits, cols = "gr
 }
 
 
+#' Map testing
+#'
+#' @return
+#' @export
 map.munich.testing = function()
 {
     a1 = c(0, 91, 135, 136, 137, 297)
@@ -625,6 +628,7 @@ map.munich.testing = function()
     map.munich(x, cols="grey")
 
 }
+
 
 
 				  

@@ -6,8 +6,8 @@
 \usage{
 bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL,
   xlab = NULL, ylab = NULL, main = NULL, sub = NULL, xlim = NULL,
-  ylim = NULL, cex.lab = 1.25, cex.axis = 1.25, type = c("random",
-  "fitted", "linear"), hpd = FALSE, ...)
+  ylim = NULL, cex.lab = 1.5, cex.axis = 1.5, type = c("random",
+  "fitted", "linear"), hpd = FALSE)
 }
 \arguments{
 \item{hpd}{}
