@@ -9,7 +9,10 @@ Description: Data and code to support a forthcoming book regarding Bayesian
 License: GPL-2
 LazyData: TRUE
 Suggests:
-    INLA
+    INLA,
+    knitr,
+    rmarkdown
 RoxygenNote: 5.0.1
 URL: http://github.com/julianfaraway/brinla
 BugReports: http://github.com/julianfaraway/brinla/issues
+VignetteBuilder: knitr
