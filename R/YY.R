@@ -11,12 +11,12 @@
 bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt", "spde", "stat")){
 	require('splines')
 	x.mesh = inla.mesh.1d(x)
-	x.ind = inla.mesh.1d.bary(x.mesh,x,"nearest")$index[,1]
-
+	x.ind = inla.mesh.1d.bary(x.mesh,x,"nearest")$index[,1] 
+		
 	n <- x.mesh$n
 	xx <- x.mesh$loc
 	x.fem = inla.mesh.1d.fem(x.mesh)
-	H = -x.fem$g1;
+	H = -x.fem$g1; 
 	H[1,] = 0; H[n,] = 0; ## Free boundaries.
     G2 = t(H)%*%Diagonal(n, 1/diag(x.fem$c0))%*%H
 
@@ -24,14 +24,14 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
 	M0 <- Diagonal(n, epsi)
 	M1 <- Diagonal(n, 0)
 	M2 <- G2
-
+	
 
 	if(type=='indpt'){
-		##B-spline basis
+		##B-spline basis 
 		prob <- seq(0, 1,, nknot)[2:(nknot-1)]
 		xk <- as.vector(quantile(x, prob=prob)) ## Knots
 		basis <- bs(xx, knots=xk, degree=degree, intercept=T)
-
+		
 		## mean and precision for theta
 		theta.mu <- rep(0, dim(basis)[2])
 		theta.Q <- diag(rep(theta.prec, dim(basis)[2]))
@@ -39,25 +39,25 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
 		# SPDE precision
 		prob.th <- seq(0, 1,, nknot)
 		xk.th <- as.vector(quantile(x, prob=prob.th))
-		xk.mesh = inla.mesh.1d(xk.th)
+		xk.mesh = inla.mesh.1d(xk.th)	
 		basis <- as.matrix(inla.mesh.1d.A(xk.mesh, xx, method='linear'))
-
+		
 		## mean and precision for theta
-		theta.mu <- rep(0, dim(basis)[2])
+		theta.mu <- rep(0, dim(basis)[2])	
 		xk.fem = inla.mesh.1d.fem(xk.mesh)
 		nk <- xk.mesh$n
 		kappa <- 1
-		Hk = -xk.fem$g1;
+		Hk = -xk.fem$g1; 
 		Bk = Diagonal(nk, diag(xk.fem$c0))
 		Bk.inv = Diagonal(nk, 1/diag(xk.fem$c0))
-		theta.Q <- theta.prec*(kappa^2*Bk - kappa*(t(Hk) + Hk) +
+		theta.Q <- theta.prec*(kappa^2*Bk - kappa*(t(Hk) + Hk) + 
 				t(Hk)%*%Bk.inv%*%Hk)
 	} else{
 		basis <- 1
 		theta.mu <- 0
 		theta.Q <- theta.prec
 	}
-
+	
 	B0 <- cBind(0, basis)
 	B1 <- cBind(0)
 	B2 <- cBind(0)
@@ -65,10 +65,11 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
 
 	spde <- inla.spde2.generic(M0, M1, M2, B0, B1, B2,
 			theta.mu, theta.Q, transform="identity", BLC = B0)
-
+			
 	spde$x.ind <- x.ind
 	return(spde)
 }
+
 
 #' Plot credible bands for a nonlinear function
 #'
@@ -286,24 +287,39 @@ bri.tps.prior <- function(
 #'
 #' @return
 #' @export
-excursions.brinla <- function(result.inla, name=NULL,
-	ind=NULL, method, u, type, alpha=0.05){
+excursions.brinla <- function(result.inla, name = NULL, 
+	ind = NULL, method, u, type, alpha = 0.05){
 	require(excursions)
-	res.exc <- excursions.inla(result.inla, name=name,
+	res.exc <- excursions.inla(result.inla, name=name, 
 		ind=ind, method=method, u=u, type=type)
-	F.out <- res.exc$F
-	if(name == 'Predictor'){
-		x <- 1:dim(result.inla$summary.linear.predictor)[1]
+		
+	if(is.null(ind) == TRUE){
+		F.out <- res.exc$F
+		if(name == 'Predictor'){
+			x <- 1:dim(result.inla$summary.linear.predictor)[1]
+		}else{
+			x <- result.inla$summary.random[[name]]$ID
+		}
+		E.out <- x[F.out >= 1-alpha]
+		G.out <- F.out >= 1-alpha
+		rho.out <- res.exc$rho
+		mean.out <- res.exc$mean
+		vars.out <- res.exc$vars		
 	}else{
-		x <- result.inla$summary.random[[name]]$ID
+		F.out <- res.exc$F[ind]
+		if(name == 'Predictor'){
+			x <- 1:dim(result.inla$summary.linear.predictor[ind,])[1]
+		}else{
+			x <- result.inla$summary.random[[name]]$ID[ind]
+		}
+		E.out <- x[F.out >= 1-alpha]
+		G.out <- F.out >= 1-alpha
+		rho.out <- res.exc$rho[ind]
+		mean.out <- res.exc$mean[ind]
+		vars.out <- res.exc$vars[ind]
 	}
-	E.out <- x[res.exc$F >= 1-alpha]
-	G.out <- res.exc$F >= 1-alpha
-	rho.out <- res.exc$rho
-	mean.out <- res.exc$mean
-	vars.out <- res.exc$vars
-	output <- list(E = E.out, F = F.out, G = G.out,
-		rho = rho.out, mean = mean.out, vars = vars.out)
+	output <- list(E = E.out, F = F.out, G = G.out, 
+		rho = rho.out, mean = mean.out, vars = vars.out)	
 	output
 }
 
@@ -323,7 +339,7 @@ bri.excursions.ggplot <- function(res.exc, xlab = NULL, ylab = NULL, main = NULL
 		
 	y <- res.exc$F
 	x <- 1:length(y)
-	yy <- rep(0, length(y))
+	yy <- rep(NA, length(y))
 	yy[res.exc$G] <- y[res.exc$G]
 	z <- res.exc$rho
 
@@ -336,7 +352,6 @@ bri.excursions.ggplot <- function(res.exc, xlab = NULL, ylab = NULL, main = NULL
    	 	geom_line(aes(x = x, y = z), lty = 2) + 
 		theme_bw(base_size = 20) 	
  }
-
 
 #' Draw Munich map
 #'
