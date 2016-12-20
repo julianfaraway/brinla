@@ -9,7 +9,6 @@
 #' @return spde object
 #' @export
 bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt", "spde", "stat")){
-	require('splines')
 	x.mesh = inla.mesh.1d(x)
 	x.ind = inla.mesh.1d.bary(x.mesh,x,"nearest")$index[,1] 
 		
@@ -18,7 +17,7 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
 	x.fem = inla.mesh.1d.fem(x.mesh)
 	H = -x.fem$g1; 
 	H[1,] = 0; H[n,] = 0; ## Free boundaries.
-    G2 = t(H)%*%Diagonal(n, 1/diag(x.fem$c0))%*%H
+    G2 = Matrix::t(H)%*%Diagonal(n, 1/Matrix::diag(x.fem$c0))%*%H
 
 	epsi <- 1e-8
 	M0 <- Diagonal(n, epsi)
@@ -34,7 +33,7 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
 		
 		## mean and precision for theta
 		theta.mu <- rep(0, dim(basis)[2])
-		theta.Q <- diag(rep(theta.prec, dim(basis)[2]))
+		theta.Q <- Matrix::diag(rep(theta.prec, dim(basis)[2]))
 	} else if(type=='spde') {
 		# SPDE precision
 		prob.th <- seq(0, 1,, nknot)
@@ -48,10 +47,10 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
 		nk <- xk.mesh$n
 		kappa <- 1
 		Hk = -xk.fem$g1; 
-		Bk = Diagonal(nk, diag(xk.fem$c0))
-		Bk.inv = Diagonal(nk, 1/diag(xk.fem$c0))
+		Bk = Diagonal(nk, Matrix::diag(xk.fem$c0))
+		Bk.inv = Diagonal(nk, 1/Matrix::diag(xk.fem$c0))
 		theta.Q <- theta.prec*(kappa^2*Bk - kappa*(t(Hk) + Hk) + 
-				t(Hk)%*%Bk.inv%*%Hk)
+				Matrix::t(Hk)%*%Bk.inv%*%Hk)
 	} else{
 		basis <- 1
 		theta.mu <- 0
@@ -154,7 +153,6 @@ bri.band.ggplot <- function(result, name = NULL, alpha = 0.05, ind = NULL, type 
 	}
 	data.plot <- data.frame(x = xx, fhat = fhat, f.lb = fhat.lb, f.ub = fhat.ub)
 
-	require(ggplot2)
 	ggplot(data.plot, aes(x = x)) +
 			geom_line(aes(y = fhat)) +
 			geom_ribbon(aes(ymin = f.lb, ymax = f.ub), alpha = 0.2) +
@@ -289,7 +287,10 @@ bri.tps.prior <- function(
 #' @export
 excursions.brinla <- function(result.inla, name = NULL, 
 	ind = NULL, method, u, type, alpha = 0.05){
-	require(excursions)
+  if (!requireNamespace("excursions", quietly = TRUE)) {
+    stop("Package excursions needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
 	res.exc <- excursions.inla(result.inla, name=name, 
 		ind=ind, method=method, u=u, type=type)
 		
@@ -345,7 +346,6 @@ bri.excursions.ggplot <- function(res.exc, xlab = NULL, ylab = NULL, main = NULL
 
 	data.plot <- data.frame(x = x, y = y, z = z, yy = yy)
 
-	require(ggplot2)
 	ggplot(data.plot, aes(x = x, y = y)) + labs(x = xlab, y = ylab) + ggtitle(main) +
 		geom_ribbon(aes(x = x, ymax = yy, ymin = 0), alpha = 0.5) + 
    		geom_line(aes(x = x, y = y)) + 
@@ -368,7 +368,10 @@ bri.excursions.ggplot <- function(res.exc, xlab = NULL, ylab = NULL, main = NULL
 				  
 map.munich = function(results, ...)
 {
-    require(BayesX)
+  if (!requireNamespace("BayesX", quietly = TRUE)) {
+    stop("Package BayesX needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
     mapping = read.table("Munich-mapping.txt")
     x = as.data.frame(cbind(mapping$V2, results))
     munich.bnd = read.bnd("Munich3.bnd")
