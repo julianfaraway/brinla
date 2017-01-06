@@ -123,3 +123,161 @@ bri.fixed.plot = function(r, together=FALSE){
   }
   invisible(cf)
 }
+
+#' Gaussian Process Regression in 1D
+#'
+#' @param x the predictor vector
+#' @param y the response vector
+#' @param pcprior limites for the penalised complexity prior (optional). If specified should be a vector 
+#' of the form c(r,s) where P(range < r = 0.05) and P(SD(y) > s = 0.05)
+#' @param nbasis - number of basis functions for the spline (default is 25)
+#' @param degree - degree for splines (default is 2) - allowable possibilities are 0, 1 or 2.
+#' @param alpha - controls shape of the GP kernel (default is 2) - 0 < alpha <=2 is possible
+#' @param xout - grid on which posterior will be calculated (default is x)
+#' @param sigma0 - prior mean for the signal SD (default is SD(y))
+#' @param rho0 - prior mean for the range
+#'
+#' @return list consisting of xout, the posterior mean, the lower 95% credibility band, 
+#' the upper 95% credibility band and the INLA object containing the fit
+#' @export
+bri.gpr <- function(x, y, pcprior, nbasis=25, degree=2, alpha=2, xout=x,
+                    sigma0=sd(y), rho0 = 0.25*(max(x) - min(x))){
+  if (!all(is.finite(c(x, y)))) 
+    stop("missing or infinite values in inputs are not allowed")
+  mesh <- inla.mesh.1d(seq(min(xout),max(xout),length.out = nbasis),degree = degree)
+  nu <-  alpha - 1/2
+  kappa0 <- sqrt(8 * nu)/rho0
+  tau0 <- 1 / (4 * kappa0^3 * sigma0^2)^0.5
+  if(missing(pcprior)){
+    spde <- inla.spde2.matern(mesh, alpha=alpha, constr = FALSE,
+                              B.tau = cbind(log(tau0), 1, 0),
+                              B.kappa = cbind(log(kappa0), 0, 1),
+                              theta.prior.prec = 1e-4)
+  }else{
+    spde <-  inla.spde2.pcmatern(mesh,alpha=alpha,prior.range=c(pcprior[1],0.05),prior.sigma=c(pcprior[2],0.05))
+  }
+  A <-  inla.spde.make.A(mesh, loc=x)
+  Ap <- inla.spde.make.A(mesh, loc=xout)
+  index <-  inla.spde.make.index("sinc", n.spde = spde$n.spde)
+  st.est <- inla.stack(data=list(y=y), A=list(A),  effects=list(index),  tag="est")
+  st.pred <- inla.stack(data=list(y=NA), A=list(Ap),  effects=list(index),  tag="pred")
+  sestpred <- inla.stack(st.est,st.pred)
+  formula <-  y ~ -1 + f(sinc, model=spde)
+  data <-  inla.stack.data(sestpred)
+  result <-  inla(formula, data=data,  family="normal",
+                  control.predictor= list(A=inla.stack.A(sestpred),compute=TRUE))
+  ii <- inla.stack.index(sestpred, tag='pred')$data
+  list(xout=xout,
+       mean=result$summary.fitted.values$mean[ii],
+       lcb=result$summary.fitted.values$"0.025quant"[ii],
+       ucb=result$summary.fitted.values$"0.975quant"[ii],
+       inlaobj=result)
+}
+
+#' Smoothness bands for Gaussian Process Regression
+#'
+#' @param x the predictor vector
+#' @param y the response vector
+#' @param nbasis - number of basis functions for the spline (default is 25)
+#' @param degree - degree for splines (default is 2) - allowable possibilities are 0, 1 or 2.
+#' @param alpha - controls shape of the GP kernel (default is 2) - 0 < alpha <=2 is possible
+#' @param xout - grid on which posterior will be calculated (default is x)
+#' @param sigma0 - prior mean for the signal SD (default is SD(y))
+#' @param rho0 - prior mean for the range
+#'
+#' @return list consisting of xout, the posterior mean, the smoother 95% credibility band, 
+#' the rougher 95% credibility band 
+#' @export
+bri.smoothband <- function(x, y, nbasis=25, degree=2, alpha=2, xout=x,
+                           sigma0=sd(y), rho0 = 0.25*(max(x) - min(x))){
+  if (!all(is.finite(c(x, y)))) 
+    stop("missing or infinite values in inputs are not allowed")
+  mesh <- inla.mesh.1d(seq(min(xout),max(xout),length.out = nbasis),degree = degree)
+  nu <-  alpha - 1/2
+  kappa0 <- sqrt(8 * nu)/rho0
+  tau0 <- 1 / (4 * kappa0^3 * sigma0^2)^0.5
+  spde <- inla.spde2.matern(mesh, alpha=alpha, constr = FALSE,
+                            B.tau = cbind(log(tau0), 1, 0),
+                            B.kappa = cbind(log(kappa0), 0, 1),
+                            theta.prior.prec = 1e-4)
+  A <-  inla.spde.make.A(mesh, loc=x)
+  Ap <- inla.spde.make.A(mesh, loc=xout)
+  index <-  inla.spde.make.index("sinc", n.spde = spde$n.spde)
+  st.est <- inla.stack(data=list(y=y), A=list(A),  effects=list(index),  tag="est")
+  st.pred <- inla.stack(data=list(y=NA), A=list(Ap),  effects=list(index),  tag="pred")
+  sestpred <- inla.stack(st.est,st.pred)
+  formula <-  y ~ -1 + f(sinc, model=spde)
+  data <-  inla.stack.data(sestpred)
+  result <-  inla(formula, data=data,  family="normal",
+                  control.predictor= list(A=inla.stack.A(sestpred),compute=TRUE))
+  mres <- inla.spde.result(result,"sinc",spde)
+  kappa0 <- exp(mres$summary.log.kappa['0.025quant'])[,]
+  sigma02 <- exp(mres$summary.log.variance.nominal['0.5quant'])[,]
+  tau0 <- 1 / (4 * kappa0^3 * sigma02)^0.5
+  spde <- inla.spde2.matern(mesh, alpha=alpha, constr = FALSE,
+                            B.tau = cbind(log(tau0)),
+                            B.kappa = cbind(log(kappa0)))
+  formula <- y ~ -1 + f(sinc, model=spde)
+  resulta <- inla(formula, data=data,  family="normal",
+                  control.predictor= list(A=inla.stack.A(sestpred),compute=TRUE))
+  kappa0 <- exp(mres$summary.log.kappa['0.975quant'])[,]
+  sigma02 <- exp(mres$summary.log.variance.nominal['0.5quant'])[,]
+  tau0 <- 1 / (4 * kappa0^3 * sigma02)^0.5
+  spde <- inla.spde2.matern(mesh, alpha=alpha, constr = FALSE,
+                            B.tau = cbind(log(tau0)),
+                            B.kappa = cbind(log(kappa0)))
+  formula <- y ~ -1 + f(sinc, model=spde)
+  resultb <- inla(formula, data=data,  family="normal",
+                  control.predictor= list(A=inla.stack.A(sestpred),compute=TRUE))
+  ii <- inla.stack.index(sestpred, tag='pred')$data
+  list(xout=xout, 
+       mean=result$summary.fitted.values$mean[ii],
+       scb=resulta$summary.fitted.values$mean[ii],
+       rcb=resultb$summary.fitted.values$mean[ii])
+}
+
+#' Non-stationary smoothing for Gaussian Process Regression in 1D
+#'
+#' @param x the predictor vector
+#' @param y the response vector
+#' @param nbasis - number of basis functions for the spline (default is 25)
+#' @param sbasis - number of basis functions for the smoothing of sigma and rho
+#' @param degree - degree for splines (default is 2) - allowable possibilities are 0, 1 or 2.
+#' @param alpha - controls shape of the GP kernel (default is 2) - 0 < alpha <=2 is possible
+#' @param xout - grid on which posterior will be calculated (default is x)
+#'
+#' @return list consisting of xout, the posterior mean, the lower 95% credibility band, 
+#' the upper 95% credibility band and the INLA object containing the fit
+#' @export
+
+bri.nonstat <- function(x, y, nbasis=25, sbasis=5, degree=2, alpha=2, xout=x,
+                        sigma0=sd(y), rho0 = 0.25*(max(x) - min(x))){
+  if (!all(is.finite(c(x, y)))) 
+    stop("missing or infinite values in inputs are not allowed")
+  mesh <- inla.mesh.1d(seq(min(xout),max(xout),length.out = nbasis),degree = degree)
+  basis.T <-as.matrix(inla.mesh.basis(mesh, type="b.spline",
+                                      n=sbasis, degree=2))
+  basis.K <-as.matrix(inla.mesh.basis(mesh, type="b.spline",
+                                      n=sbasis, degree=2))
+  spde <- inla.spde2.matern(mesh, alpha=alpha,
+                            B.tau = cbind(basis.T[-1,],0),
+                            B.kappa = cbind(0,basis.K[-1,]/2),
+                            theta.prior.prec = 1e-4)
+  A <-  inla.spde.make.A(mesh, loc=x)
+  Ap <- inla.spde.make.A(mesh, loc=xout)
+  index <-  inla.spde.make.index("sinc", n.spde = spde$n.spde)
+  st.est <- inla.stack(data=list(y=y), A=list(A),  effects=list(index),  tag="est")
+  st.pred <- inla.stack(data=list(y=NA), A=list(Ap),  effects=list(index),  tag="pred")
+  sestpred <- inla.stack(st.est,st.pred)
+  formula <-  y ~ -1 + f(sinc, model=spde)
+  data <-  inla.stack.data(sestpred)
+  result <-  inla(formula, data=data,  family="normal",
+                  control.predictor= list(A=inla.stack.A(sestpred),compute=TRUE))
+  ii <- inla.stack.index(sestpred, tag='pred')$data
+  list(xout=xout,
+       mean=result$summary.fitted.values$mean[ii],
+       lcb=result$summary.fitted.values$"0.025quant"[ii],
+       ucb=result$summary.fitted.values$"0.975quant"[ii],
+       inlaobj=result)
+}
+

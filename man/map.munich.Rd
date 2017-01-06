@@ -7,7 +7,7 @@
 map.munich(results, ...)
 }
 \arguments{
-\item{alpha}{}
+\item{results}{}
 }
 \description{
 Draw Munich map
