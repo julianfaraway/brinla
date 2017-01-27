@@ -4,7 +4,7 @@
 \alias{bri.band.ggplot}
 \title{Plot credible bands for a nonlinear function}
 \usage{
-bri.band.ggplot(result, name = NULL, alpha = 0.05, ind = NULL,
+bri.band.ggplot(result, name = NULL, x = NULL, alpha = 0.05, ind = NULL,
   type = c("random", "fitted", "linear", "lincomb"), xlab = NULL,
   ylab = NULL, main = NULL, hpd = FALSE)
 }

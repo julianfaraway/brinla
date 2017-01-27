@@ -4,10 +4,10 @@
 \alias{bri.band.plot}
 \title{Plot credible band for nonlinear function}
 \usage{
-bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL,
+bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL, x = NULL,
   xlab = NULL, ylab = NULL, main = NULL, sub = NULL, xlim = NULL,
   ylim = NULL, cex.lab = 1.5, cex.axis = 1.5, type = c("random",
-  "fitted", "linear"), hpd = FALSE)
+  "fitted", "linear"), hpd = FALSE, gray.band = TRUE)
 }
 \arguments{
 \item{hpd}{}
