@@ -21,3 +21,7 @@ A forthcoming book by [Xiaofeng Wang](https://filer.case.edu/xxw17/), [Ryan Yue]
 
 The [brinla](https://github.com/julianfaraway/brinla) R package contains data and functions
 to support the book.
+
+## Examples
+
+Here are some (preview examples)[http://people.bath.ac.uk/jjf23/brinla/]
