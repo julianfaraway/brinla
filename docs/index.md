@@ -24,4 +24,4 @@ to support the book.
 
 ## Examples
 
-Here are some (preview examples)[http://people.bath.ac.uk/jjf23/brinla/]
+Here are some [preview examples](http://people.bath.ac.uk/jjf23/brinla/)
