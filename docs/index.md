@@ -15,3 +15,9 @@ A forthcoming book by [Xiaofeng Wang](https://filer.case.edu/xxw17/), [Ryan Yue]
 9. Generalized Additive Models
 10. Errors-in-Variables Regression
 11. Miscellaneous Topics
+
+
+## R package
+
+The [brinla](https://github.com/julianfaraway/brinla) R package contains data and functions
+to support the book.

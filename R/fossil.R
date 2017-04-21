@@ -8,12 +8,11 @@
 #'
 #' @format A data frame with 2 columns and 106 rows. The columns are:
 #' \itemize{
-#' \item{age}{in millions of years.}
-#' \item{sr}{strontium ratio.}}
+#' \item{age}{ in millions of years.}
+#' \item{sr}{ strontium ratio.}}
 #'
 #' @details The ratio of strontium isotopes found in fossil shells in the mid-Cretaceous
-#' period from about 90 to 125 million years ago. The strontium ratio has been rescaled in
-#' the same manner as the SiZer paper.
+#' period from about 90 to 125 million years ago. 
 #'
 #' @keywords datasets
 #'

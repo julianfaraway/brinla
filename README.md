@@ -3,7 +3,7 @@ This R package contains data and R code from the [forthcoming book](http://julia
 
 You can install it (provided you have loaded the `devtools` package) with:
 
-``` r
+```
 install_github(“julianfaraway/brinla”)
 ```
 
