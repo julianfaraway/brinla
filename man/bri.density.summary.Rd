@@ -15,4 +15,3 @@ numerical summary
 \description{
 Compute a summary from a density
 }
-

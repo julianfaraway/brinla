@@ -25,4 +25,3 @@ data(ACTG320)
 here
 }
 \keyword{datasets}
-

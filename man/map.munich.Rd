@@ -12,4 +12,3 @@ map.munich(results, ...)
 \description{
 Draw Munich map
 }
-

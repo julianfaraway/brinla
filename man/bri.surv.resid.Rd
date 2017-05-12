@@ -17,4 +17,3 @@ bri.surv.resid(inla.obj, time, event)
 the function supports Weibull model, Expontenial model and Cox proportional hazards model for right censored data.
 Three types of residuals could be obtained: Cox-Snell residual; Martingale residuals; Deviance residuals.
 }
-

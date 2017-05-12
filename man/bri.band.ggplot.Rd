@@ -14,4 +14,3 @@ bri.band.ggplot(result, name = NULL, x = NULL, alpha = 0.05, ind = NULL,
 \description{
 Plot credible bands for a nonlinear function
 }
-

@@ -25,4 +25,3 @@ data(joint)
 here
 }
 \keyword{datasets}
-

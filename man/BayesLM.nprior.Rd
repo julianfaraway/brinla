@@ -27,4 +27,3 @@ set.seed(1)
 cars.blm <- BayesLM.nprior(cars.lm,10000)
 
 }
-

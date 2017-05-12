@@ -18,4 +18,3 @@ bri.excursions.ggplot(res.exc, xlab = NULL, ylab = NULL, main = NULL)
 \description{
 Excursions
 }
-

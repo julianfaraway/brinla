@@ -34,4 +34,3 @@ bri.lmresid.plot(inla.obj, covariate = NULL, m = 1000, pmedian = FALSE,
 \description{
 linear regression model Baysian residual plot
 }
-

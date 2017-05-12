@@ -15,4 +15,3 @@ a data frame with the densities and group labels
 \description{
 Plot the posterior densities of the random effects
 }
-

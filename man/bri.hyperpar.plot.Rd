@@ -17,4 +17,3 @@ data frame containing the densities
 \description{
 Plot the hyperparameter posteriors
 }
-

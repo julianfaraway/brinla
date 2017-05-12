@@ -23,4 +23,3 @@ The data were collected to investigate the change in reading scores over time
 data(reading)
 }
 \keyword{datasets}
-

@@ -48,4 +48,3 @@ my.drawmap(data, map, regionvar = 2, plotvar = 3, limits, cols = "grey",
 \description{
 Draw map
 }
-

@@ -16,4 +16,3 @@ spde object
 \description{
 Adaptive prior
 }
-

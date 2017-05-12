@@ -26,4 +26,3 @@ bri.dresid.plot(resid.obj, covariate = NULL, smooth = FALSE, xlab = NULL,
 \description{
 Deviance residual plots
 }
-

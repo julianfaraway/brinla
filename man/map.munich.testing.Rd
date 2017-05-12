@@ -9,4 +9,3 @@ map.munich.testing()
 \description{
 Map testing
 }
-

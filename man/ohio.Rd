@@ -26,4 +26,3 @@ Fitzmaurice, G.M. and Laird, N.M. (1993) A likelihood-based method for
 analyzing longitudinal binary responses, Biometrika 80: 141–151.
 }
 \keyword{datasets}
-

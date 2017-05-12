@@ -17,4 +17,3 @@ an SD density
 \description{
 Convert precision to SD
 }
-

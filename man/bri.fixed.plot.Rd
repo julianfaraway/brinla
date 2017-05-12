@@ -15,4 +15,3 @@ a data frame containing the densities and parameter labels (invisible)
 \description{
 Plot posterior densities of the fixed effects
 }
-

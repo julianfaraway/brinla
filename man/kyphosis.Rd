@@ -27,4 +27,3 @@ John M. Chambers and Trevor J. Hastie eds. (1992)
 Statistical Models in S, Wadsworth and Brooks/Cole, Pacific Grove, CA.
 }
 \keyword{datasets}
-

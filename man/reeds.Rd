@@ -25,4 +25,3 @@ data(reeds)
 Biomeasurement: A Student's Guide to Biological Statistics by Dawn Hawkins
 }
 \keyword{datasets}
-

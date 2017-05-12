@@ -13,4 +13,3 @@ bri.tps.prior(mesh, constr = FALSE, extraconstr.int = NULL,
 \description{
 TPS Prior
 }
-

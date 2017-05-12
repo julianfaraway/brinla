@@ -15,4 +15,3 @@ summary of hyperparameters on SD scale (where appropriate)
 \description{
 Convert precisions to SD in INLA hyperparameter summary
 }
-

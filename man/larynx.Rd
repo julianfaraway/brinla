@@ -25,4 +25,3 @@ data(larynx)
 here
 }
 \keyword{datasets}
-

@@ -15,4 +15,3 @@ bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL, x = NULL,
 \description{
 Plot credible band for nonlinear function
 }
-

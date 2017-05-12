@@ -34,4 +34,3 @@ the upper 95% credibility band and the INLA object containing the fit
 \description{
 Gaussian Process Regression in 1D
 }
-

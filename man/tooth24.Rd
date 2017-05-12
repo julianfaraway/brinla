@@ -25,4 +25,3 @@ data(tooth24)
 here
 }
 \keyword{datasets}
-

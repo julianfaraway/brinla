@@ -39,4 +39,3 @@ NUCLEAR DECAY: EVIDENCE FOR A YOUNG WORLD - IMPACT No. 352 October 2002 by D. Ru
 Wood, S.N. (2006) Generalized Additive Models: An Introduction with R. CRC press
 }
 \keyword{datasets}
-

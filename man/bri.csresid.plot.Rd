@@ -24,4 +24,3 @@ bri.csresid.plot(resid.obj, lwd = 2, xlab = "Cox-Snell Residual",
 \description{
 Cox-Snell residual plot
 }
-

@@ -13,4 +13,3 @@ excursions.brinla(result.inla, name = NULL, ind = NULL, method, u, type,
 \description{
 Excursions
 }
-

@@ -661,6 +661,15 @@ default.knots <- function(x,num.knots)
   return(quantile(unique(x), seq(0, 1, length = (num.knots + 2))[-c(1, (num.knots + 2))]))
 }
 
+#' Mixed splines
+#'
+#' @param z 
+#' @param degree 
+#' @param Nknots 
+#' @param type 
+#'
+#' @return
+#' @export
 spline.mixed <- function(z, degree = 3, Nknots = NULL, type = c("TPB", "OSS")){
   if(is.null(Nknots) == TRUE){
     Nknots <- num.knots(z)

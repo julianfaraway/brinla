@@ -39,4 +39,3 @@ Brian S Everitt. An R and S-PLUS companion to multivariate analysis.
 Springer Science & Business Media, 2006.
 }
 \keyword{datasets}
-

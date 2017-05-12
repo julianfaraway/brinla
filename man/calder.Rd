@@ -29,4 +29,3 @@ data(calder)
 Data obtained from \url{http://nrfa.ceh.ac.uk/data/station/info/74006}
 }
 \keyword{datasets}
-

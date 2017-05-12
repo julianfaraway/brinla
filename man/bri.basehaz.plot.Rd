@@ -17,4 +17,3 @@ bri.basehaz.plot(inla.obj, plot = TRUE, cex.lab = 1.25, cex.axis = 1.25,
 \description{
 the function supports Weibull model, Expontenial model and Cox proportional hazards model for right censored data.
 }
-
