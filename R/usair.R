@@ -10,14 +10,13 @@
 #'
 #' @format A data frame with 7 columns and 41 rows. The columns are:
 #' \itemize{
-#' \item{City}{Name of the US city}
 #' \item{SO2}{Sulphur dioxide content of air in micrograms per cubic meter.}
-#' \item{Neg.Temp}{Negative value of Average annual temperature in fahrenheit.}
-#' \item{Manuf}{Number of manufacturing enterprises employing 20 or more workers.}
-#' \item{Pop}{Population size (1970 census) in thousands.}
-#' \item{Wind}{Average annual wind speed in miles per hour.}
-#' \item{Precip}{Average annual precipitation in inches.}
-#' \item{Days}{Average number of days with precipitation per year}
+#' \item{negtemp}{Negative value of Average annual temperature in fahrenheit.}
+#' \item{manuf}{Number of manufacturing enterprises employing 20 or more workers.}
+#' \item{pop}{Population size (1970 census) in thousands.}
+#' \item{wind}{Average annual wind speed in miles per hour.}
+#' \item{precip}{Average annual precipitation in inches.}
+#' \item{days}{Average number of days with precipitation per year}
 #' }
 #' @details Note that Neg.Temp represents the negative value of Average annual temperature.
 #'
