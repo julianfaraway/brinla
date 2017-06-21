@@ -21,6 +21,10 @@ bri.dresid.plot(resid.obj, covariate = NULL, smooth = FALSE, xlab = NULL,
 
 \item{main}{}
 
+\item{cex.lab}{}
+
+\item{cex.axis}{}
+
 \item{...}{}
 }
 \description{

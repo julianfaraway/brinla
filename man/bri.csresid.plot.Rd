@@ -19,6 +19,10 @@ bri.csresid.plot(resid.obj, lwd = 2, xlab = "Cox-Snell Residual",
 
 \item{main}{}
 
+\item{cex.lab}{}
+
+\item{cex.axis}{}
+
 \item{...}{}
 }
 \description{

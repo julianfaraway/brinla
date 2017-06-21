@@ -2,7 +2,9 @@
 % Please edit documentation in R/XFW.R
 \name{bri.surv.resid}
 \alias{bri.surv.resid}
-\title{Residuals for inla survival models}
+\title{this function is to obtain the different residuals for inla survival models
+the function supports Weibull model, Expontenial model and Cox proportional hazards model for right censored data.
+Three types of residuals could be obtained: Cox-Snell residual; Martingale residuals; Deviance residuals.}
 \usage{
 bri.surv.resid(inla.obj, time, event)
 }
@@ -14,6 +16,7 @@ bri.surv.resid(inla.obj, time, event)
 \item{event}{}
 }
 \description{
+this function is to obtain the different residuals for inla survival models
 the function supports Weibull model, Expontenial model and Cox proportional hazards model for right censored data.
 Three types of residuals could be obtained: Cox-Snell residual; Martingale residuals; Deviance residuals.
 }

@@ -2,7 +2,8 @@
 % Please edit documentation in R/XFW.R
 \name{bri.basehaz.plot}
 \alias{bri.basehaz.plot}
-\title{compute the baseline hazard function in INLA survival models}
+\title{compute the baseline hazard function in INLA survival models
+the function supports Weibull model, Expontenial model and Cox proportional hazards model for right censored data.}
 \usage{
 bri.basehaz.plot(inla.obj, plot = TRUE, cex.lab = 1.25, cex.axis = 1.25,
   ...)
@@ -12,8 +13,13 @@ bri.basehaz.plot(inla.obj, plot = TRUE, cex.lab = 1.25, cex.axis = 1.25,
 
 \item{plot}{}
 
+\item{cex.lab}{}
+
+\item{cex.axis}{}
+
 \item{...}{}
 }
 \description{
+compute the baseline hazard function in INLA survival models
 the function supports Weibull model, Expontenial model and Cox proportional hazards model for right censored data.
 }
