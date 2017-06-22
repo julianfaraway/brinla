@@ -60,6 +60,7 @@ bri.hyperpar.summary = function(r){
 #' @return data frame containing the densities
 #' @export
 bri.hyperpar.plot = function(r,together=TRUE){
+  if (!require("ggplot2")) stop("Function requires ggplot2 package. Please install this first.")
   irp = r$internal.marginals.hyperpar
   hrp = r$marginals.hyperpar
   hypnames = names(irp)
@@ -94,6 +95,7 @@ bri.hyperpar.plot = function(r,together=TRUE){
 #' @return a data frame with the densities and group labels
 #' @export
 bri.random.plot = function(r){
+  if (!require("ggplot2")) stop("Function requires ggplot2 package. Please install this first.")
   reff <- r$marginals.random
   irp = reff[[1]]
   cf = data.frame(do.call(rbind,irp))
@@ -110,6 +112,7 @@ bri.random.plot = function(r){
 #' @return a data frame containing the densities and parameter labels (invisible)
 #' @export
 bri.fixed.plot = function(r, together=FALSE){
+  if (!require("ggplot2")) stop("Function requires ggplot2 package. Please install this first.")
   rmf = r$marginals.fixed
   cf = data.frame(do.call(rbind, rmf))
   cf$parameter = rep(names(rmf),times=sapply(rmf,nrow))
