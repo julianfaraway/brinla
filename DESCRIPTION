@@ -14,8 +14,9 @@ Imports:
     ggplot2,
     Matrix,
     splines
+Depends:
+    INLA
 Suggests:
-    INLA,
     knitr,
     rmarkdown,
     excursions

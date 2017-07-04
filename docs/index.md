@@ -8,10 +8,10 @@ A forthcoming book by [Xiaofeng Wang](https://filer.case.edu/xxw17/), [Ryan Yue]
 2. Theory of INLA
 3. Linear Regression
 4. Generalized Linear Models
-5. Generalized Linear Mixed Models
+5. Generalized Linear Mixed Models [glmm.R](scripts/glmm.R) with [output](scripts/glmm.html)
 6. Survival Analysis
 7. Random Walk Models for Smoothing
-8. Gaussian Process Regression
+8. Gaussian Process Regression [gpr.R](scripts/gpr.R) with [output](scripts/gpr.html)
 9. Generalized Additive Models
 10. Errors-in-Variables Regression
 11. Miscellaneous Topics
