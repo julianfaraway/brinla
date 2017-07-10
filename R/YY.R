@@ -50,7 +50,7 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
     Hk = -xk.fem$g1; 
     Bk = Diagonal(nk, Matrix::diag(xk.fem$c0))
     Bk.inv = Diagonal(nk, 1/Matrix::diag(xk.fem$c0))
-    theta.Q <- theta.prec*(kappa^2*Bk - kappa*(t(Hk) + Hk) + 
+    theta.Q <- theta.prec*(kappa^2*Bk - kappa*(Matrix::t(Hk) + Hk) + 
                              Matrix::t(Hk)%*%Bk.inv%*%Hk)
   } else{
     basis <- 1
