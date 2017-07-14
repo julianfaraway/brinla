@@ -2,7 +2,7 @@
 % Please edit documentation in R/YY.R
 \name{bri.band.plot}
 \alias{bri.band.plot}
-\title{Plot credible band for nonlinear function}
+\title{Plot credible band for a nonlinear function using plot()}
 \usage{
 bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL, x = NULL,
   xlab = NULL, ylab = NULL, main = NULL, sub = NULL, xlim = NULL,
@@ -10,8 +10,34 @@ bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL, x = NULL,
   "fitted", "linear"), hpd = FALSE, gray.band = TRUE)
 }
 \arguments{
-\item{hpd}{}
+\item{result}{the result object from INLA call}
+
+\item{name}{the name of the component for which to do the plot}
+
+\item{alpha}{specifies the credibility level as 100(1-alpha)\%}
+
+\item{ind}{the indices for the part of a component that should be plotted}
+
+\item{x}{the predictor vector}
+
+\item{xlab}{a title for the x axis}
+
+\item{ylab}{a title for the y axis}
+
+\item{main}{an overall title for the plot}
+
+\item{sub}{a sub title for the plot}
+
+\item{xlim}{sets the limits of x axis}
+
+\item{ylim}{sets the limits of y axis}
+
+\item{type}{the type of nonlinear function to be plotted: 'random' random effects; 'fitted' fitted values; 'linear' linear predictors}
+
+\item{hpd}{TRUE if highest posterior density (HPD) interval is plotted (FALSE by default)}
+
+\item{gray.band}{TRUE (default) if the credible band is filled with gray color}
 }
 \description{
-Plot credible band for nonlinear function
+Plot credible band for a nonlinear function using plot()
 }

@@ -17,3 +17,6 @@ an SD density
 \description{
 Convert precision to SD
 }
+\author{
+Julian Faraway, \email{jjf23@bath.ac.uk}
+}

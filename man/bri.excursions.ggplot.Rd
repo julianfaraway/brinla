@@ -2,19 +2,22 @@
 % Please edit documentation in R/YY.R
 \name{bri.excursions.ggplot}
 \alias{bri.excursions.ggplot}
-\title{Excursions}
+\title{Plot excursion sets and contour credible regions}
 \usage{
 bri.excursions.ggplot(res.exc, xlab = NULL, ylab = NULL, main = NULL)
 }
 \arguments{
-\item{res.exc}{}
+\item{res.exc}{result object from excursions.brinla()}
 
-\item{xlab}{}
+\item{xlab}{a title for x axis}
 
-\item{ylab}{}
+\item{ylab}{a title for y axis}
 
-\item{main}{}
+\item{main}{an overall title for the plot}
+}
+\value{
+a plot that shows the excursion set, the corresponding excursion function and the marginal excursion probabilities
 }
 \description{
-Excursions
+Plot excursion sets and contour credible regions
 }

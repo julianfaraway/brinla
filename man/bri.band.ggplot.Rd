@@ -2,15 +2,31 @@
 % Please edit documentation in R/YY.R
 \name{bri.band.ggplot}
 \alias{bri.band.ggplot}
-\title{Plot credible bands for a nonlinear function}
+\title{Plot credible band for a nonlinear function using ggplot()}
 \usage{
 bri.band.ggplot(result, name = NULL, x = NULL, alpha = 0.05, ind = NULL,
   type = c("random", "fitted", "linear", "lincomb"), xlab = NULL,
   ylab = NULL, main = NULL, hpd = FALSE)
 }
 \arguments{
-\item{plot.data}{}
+\item{result}{the result object from INLA call}
+
+\item{name}{the name of the component for which to do the plot}
+
+\item{alpha}{specifies the credibility level as 100(1-alpha)\%}
+
+\item{ind}{the indices for the part of a component that should be plotted}
+
+\item{type}{the type of nonlinear function to be plotted: 'random' random effects; 'fitted' fitted values; 'linear' linear predictors; 'lincomb' linear combinations}
+
+\item{xlab}{a title for the x axis}
+
+\item{ylab}{a title for the y axis}
+
+\item{main}{an overall title for the plot}
+
+\item{hpd}{TRUE if highest posterior density (HPD) interval is plotted (FALSE by default)}
 }
 \description{
-Plot credible bands for a nonlinear function
+Plot credible band for a nonlinear function using ggplot()
 }

@@ -1,14 +1,14 @@
-#' Adaptive prior
+#' Construct a random walk prior for adaptive smoothing 
+#' 
+#' @param x the predictor vector
+#' @param degree the degree of B-spline basis used for the smoothing function (default is 3)
+#' @param nknot the number of knots for the B-spline basis (default is 5)
+#' @param theta.prec the fixed precision of the Gaussian prior on the smoothing function (default value is 0.01)
+#' @param type the type of the Gaussian prior on the smoothing function: 'indpt' independent Gaussian priors; 'spde' SPDE prior
 #'
-#' @param x
-#' @param degree
-#' @param nknot
-#' @param theta.prec
-#' @param type
-#'
-#' @return spde object
+#' @return an object for the 'model' option in inla()
 #' @export
-bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt", "spde", "stat")){
+bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt", "spde")){
   require('splines')
   x.mesh = inla.mesh.1d(x)
   x.ind = inla.mesh.1d.bary(x.mesh,x,"nearest")$index[,1] 
@@ -25,7 +25,6 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
   M1 <- Diagonal(n, 0)
   M2 <- G2
   
-  
   if(type=='indpt'){
     ##B-spline basis 
     prob <- seq(0, 1,, nknot)[2:(nknot-1)]
@@ -35,7 +34,7 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
     ## mean and precision for theta
     theta.mu <- rep(0, dim(basis)[2])
     theta.Q <- Matrix::diag(rep(theta.prec, dim(basis)[2]))
-  } else if(type=='spde') {
+  } else {
     # SPDE precision
     prob.th <- seq(0, 1,, nknot)
     xk.th <- as.vector(quantile(x, prob=prob.th))
@@ -50,45 +49,34 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
     Hk = -xk.fem$g1; 
     Bk = Diagonal(nk, Matrix::diag(xk.fem$c0))
     Bk.inv = Diagonal(nk, 1/Matrix::diag(xk.fem$c0))
-    theta.Q <- theta.prec*(kappa^2*Bk - kappa*(Matrix::t(Hk) + Hk) + 
-                             Matrix::t(Hk)%*%Bk.inv%*%Hk)
-  } else{
-    basis <- 1
-    theta.mu <- 0
-    theta.Q <- theta.prec
-  }
+    theta.Q <- theta.prec*(kappa^2*Bk - kappa*(Matrix::t(Hk) + Hk) + Matrix::t(Hk)%*%Bk.inv%*%Hk)
+  } 
   
   B0 <- cBind(0, basis)
   B1 <- cBind(0)
   B2 <- cBind(0)
   
-  
-  spde <- inla.spde2.generic(M0, M1, M2, B0, B1, B2,
-                             theta.mu, theta.Q, transform="identity", BLC = B0)
+  spde <- inla.spde2.generic(M0, M1, M2, B0, B1, B2, theta.mu, theta.Q, transform="identity", BLC = B0)
   
   spde$x.ind <- x.ind
   return(spde)
 }
 
 
-#' Plot credible bands for a nonlinear function
+#' Plot credible band for a nonlinear function using ggplot()
 #'
-#' @param result
-#' @param name
-#' @param alpha
-#' @param ind
-#' @param type
-#' @param xlab
-#' @param ylab
-#' @param main
-#' @param hpd
-#' @param plot.data
+#' @param result the result object from INLA call
+#' @param name the name of the component for which to do the plot
+#' @param alpha specifies the credibility level as 100(1-alpha)\%
+#' @param ind the indices for the part of a component that should be plotted
+#' @param type the type of nonlinear function to be plotted: 'random' random effects; 'fitted' fitted values; 'linear' linear predictors; 'lincomb' linear combinations
+#' @param xlab a title for the x axis
+#' @param ylab a title for the y axis
+#' @param main an overall title for the plot
+#' @param hpd TRUE if highest posterior density (HPD) interval is plotted (FALSE by default) 
 #'
-#' @return
+#' @return 
 #' @export
-
-## Function to plot credible band for nonlinear function
-
 
 ## Function to plot credible band for nonlinear function
 
@@ -170,20 +158,22 @@ bri.band.ggplot <- function(result, name = NULL, x = NULL, alpha = 0.05, ind = N
   # print(p)
   # invisible(data.plot)
 }
-#' Plot credible band for nonlinear function
+#' Plot credible band for a nonlinear function using plot()
 #'
-#' @param result
-#' @param name
-#' @param alpha
-#' @param ind
-#' @param xlab
-#' @param ylab
-#' @param main
-#' @param sub
-#' @param xlim
-#' @param ylim
-#' @param type
-#' @param hpd
+#' @param result the result object from INLA call
+#' @param name the name of the component for which to do the plot
+#' @param alpha specifies the credibility level as 100(1-alpha)\%
+#' @param ind the indices for the part of a component that should be plotted
+#' @param x the predictor vector
+#' @param xlab a title for the x axis
+#' @param ylab a title for the y axis
+#' @param main an overall title for the plot
+#' @param sub a sub title for the plot
+#' @param xlim sets the limits of x axis
+#' @param ylim sets the limits of y axis
+#' @param type the type of nonlinear function to be plotted: 'random' random effects; 'fitted' fitted values; 'linear' linear predictors
+#' @param hpd TRUE if highest posterior density (HPD) interval is plotted (FALSE by default) 
+#' @param gray.band TRUE (default) if the credible band is filled with gray color
 #'
 #' @return
 #' @export
@@ -264,14 +254,14 @@ bri.band.plot <- function(result, name = NULL, alpha = 0.05, ind = NULL, x = NUL
   invisible(data.plot)
 }
 
-#' TPS Prior
+#' Construct a thin-plate spline prior
 #'
-#' @param mesh
-#' @param constr
-#' @param extraconstr.int
-#' @param extraconstr
-#' @param theta.mean
-#' @param theta.prec
+#' @param mesh the mesh to build the model on
+#' @param constr TRUE if apply an integrate-to-zero constraint. Default FALSE.
+#' @param extraconstr.int extra field integral constraints
+#' @param extraconstr direct linear combination constraints on the basis weights
+#' @param theta.mean prior mean for theta
+#' @param theta.prec prior precision for theta
 #'
 #' @return
 #' @export
@@ -284,33 +274,30 @@ bri.tps.prior <- function(
   B.tau <- cbind(0, 1)
   B.kappa <- cbind(log(1e-6), 0)
   output <- inla.spde2.matern(mesh, 
-                              B.tau = B.tau, B.kappa = B.kappa, 
-                              theta.prior.mean = theta.mean, 
-                              theta.prior.prec = theta.prec)
+                B.tau = B.tau, B.kappa = B.kappa, 
+                theta.prior.mean = theta.mean, 
+                theta.prior.prec = theta.prec)
   output    
 }
 
-#' Excursions
+#' Excursion sets and contour credible regions for latent Gaussian models
+#' A wrapper function for excursions.inla() in excursions package
+#' @param result.inla result object from INLA call
+#' @param name The name of the component for which to do the calculation
+#' @param ind the indices for the part of a component that should be used in the calculations
+#' @param method the method for handeling the latent Gaussian structure: 'EB' empirical Bayes; 'QC' quantile correction; 'NI' numerical integration; 'NIQC' numerical integration with quantile correction; 'iNIQC' improved integration with quantle correction
+#' @param u the excursion or contour level
+#' @param type the type of region: '>' positive excursions; '<' negative excursions; '!=' contour avoiding function; '=' contour credibility function 
+#' @param alpha specifies the joint probability of an excursion set or contour credible region as 1-alpha
 #'
-#' @param result.inla
-#' @param name
-#' @param ind
-#' @param method
-#' @param u
-#' @param type
-#' @param alpha
-#'
-#' @return
+#' @return a list that contains the following arguments: 'E' excursion set, contour credible region, or contour avoiding set with 1-alpha probability; 'F' the excursion function corresponding to the set E; 'G' the excursion function F thresholded at 1-alpha; 'rho' marginal excursion probabilities; 'mean' posterior mean; 'vars' marginal variances  
 #' @export
-excursions.brinla <- function(result.inla, name = NULL, 
-                              ind = NULL, method, u, type, alpha = 0.05){
+excursions.brinla <- function(result.inla, name = NULL, ind = NULL, method, u, type, alpha = 0.05){
   require(excursions)
   if (!requireNamespace("excursions", quietly = TRUE)) {
-    stop("Package excursions needed for this function to work. Please install it.",
-         call. = FALSE)
+    stop("Package excursions needed for this function to work. Please install it.", call. = FALSE)
   }
-  res.exc <- excursions.inla(result.inla, name=name, 
-                             ind=ind, method=method, u=u, type=type)
+  res.exc <- excursions.inla(result.inla, name=name, ind=ind, method=method, u=u, type=type)
   
   if(is.null(ind) == TRUE){
     F.out <- res.exc$F
@@ -337,20 +324,19 @@ excursions.brinla <- function(result.inla, name = NULL,
     mean.out <- res.exc$mean[ind]
     vars.out <- res.exc$vars[ind]
   }
-  output <- list(E = E.out, F = F.out, G = G.out, 
-                 rho = rho.out, mean = mean.out, vars = vars.out)	
+  output <- list(E = E.out, F = F.out, G = G.out, rho = rho.out, mean = mean.out, vars = vars.out)	
   output
 }
 
 
-#' Excursions
+#' Plot excursion sets and contour credible regions 
 #'
-#' @param res.exc 
-#' @param xlab 
-#' @param ylab 
-#' @param main 
+#' @param res.exc result object from excursions.brinla()
+#' @param xlab a title for x axis
+#' @param ylab a title for y axis
+#' @param main an overall title for the plot 
 #'
-#' @return
+#' @return a plot that shows the excursion set, the corresponding excursion function and the marginal excursion probabilities
 #' @export
 bri.excursions.ggplot <- function(res.exc, xlab = NULL, ylab = NULL, main = NULL)
 {
@@ -378,9 +364,9 @@ bri.excursions.ggplot <- function(res.exc, xlab = NULL, ylab = NULL, main = NULL
 
 #' Draw Munich map
 #'
-#' @param results
+#' @param results the vector of values to be shown on the map
 #'
-#' @return
+#' @return 
 #' @export				  
 
 map.munich = function(results, ...)
@@ -412,11 +398,7 @@ map.munich = function(results, ...)
 #' @return
 #' @export
 
-my.drawmap = function (data, map, regionvar = 2, plotvar = 3, limits, cols = "grey", 
-                       nrcolors = 100, swapcolors = TRUE, pcat = FALSE, hcl.par = list(h = c(130, 
-                                                                                             25), c = 100, l = c(90, 70)), hsv.par = list(s = 1, v = 1), 
-                       legend = TRUE, drawnames = FALSE, cex.names = 0.7, cex.legend = 1.5, 
-                       mar.min = 2, ...) 
+my.drawmap = function (data, map, regionvar = 2, plotvar = 3, limits, cols = "grey", nrcolors = 100, swapcolors = TRUE, pcat = FALSE, hcl.par = list(h = c(130, 25), c = 100, l = c(90, 70)), hsv.par = list(s = 1, v = 1), legend = TRUE, drawnames = FALSE, cex.names = 0.7, cex.legend = 1.5, mar.min = 2, ...) 
 {
   if (!inherits(map, "bnd")) 
     stop("Argument 'map' is not an object of class 'bnd'!")
@@ -658,12 +640,21 @@ map.munich.testing = function()
   
 }
 
+#' Choose the number of knots
+#' An internal function for spline.mixed()
+#' @return
+#' @export
 
 num.knots <- function(x){
   x.uniq <- unique(x)
   num.knots <- max(5, min(floor(length(unique(x))/4), 35))
   return(num.knots)
 }
+
+#' Creat the vector of default knots
+#' An internal function for spline.mixed()
+#' @return
+#' @export
 
 default.knots <- function(x,num.knots)
 {
@@ -672,6 +663,16 @@ default.knots <- function(x,num.knots)
   
   return(quantile(unique(x), seq(0, 1, length = (num.knots + 2))[-c(1, (num.knots + 2))]))
 }
+
+#' Make matrices in the linear mixed models for truncated power basis splines and O'Sullivan splines
+#' 
+#' @param z the predictor vector
+#' @param degree the degree of B-spline basis
+#' @param Nknots the number of knots used in B-spline basis; the default number will be used if not specified
+#' @param type the type of spline models: 'TPB' truncated power basis splines; 'OSS' O'Sullivan splines
+#' 
+#' @return X: matrix for fixed effects; Z: matrix for random effects; Q: penalty matrix in O'Sullivan splines; B: matrix of B-spline basis functions 
+#' @export
 
 spline.mixed <- function(z, degree = 3, Nknots = NULL, type = c("TPB", "OSS")){
   require('splines')
@@ -729,5 +730,4 @@ spline.mixed <- function(z, degree = 3, Nknots = NULL, type = c("TPB", "OSS")){
     return(list(X = X, Z = Z))
   }
 }
-
 

@@ -2,17 +2,25 @@
 % Please edit documentation in R/YY.R
 \name{bri.adapt.prior}
 \alias{bri.adapt.prior}
-\title{Adaptive prior}
+\title{Construct a random walk prior for adaptive smoothing}
 \usage{
 bri.adapt.prior(x, degree = 3, nknot = 5, theta.prec = 0.01,
-  type = c("indpt", "spde", "stat"))
+  type = c("indpt", "spde"))
 }
 \arguments{
-\item{type}{}
+\item{x}{the predictor vector}
+
+\item{degree}{the degree of B-spline basis used for the smoothing function (default is 3)}
+
+\item{nknot}{the number of knots for the B-spline basis (default is 5)}
+
+\item{theta.prec}{the fixed precision of the Gaussian prior on the smoothing function (default value is 0.01)}
+
+\item{type}{the type of the Gaussian prior on the smoothing function: 'indpt' independent Gaussian priors; 'spde' SPDE prior}
 }
 \value{
-spde object
+an object for the 'model' option in inla()
 }
 \description{
-Adaptive prior
+Construct a random walk prior for adaptive smoothing
 }

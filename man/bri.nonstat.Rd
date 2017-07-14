@@ -29,3 +29,6 @@ the upper 95% credibility band and the INLA object containing the fit
 \description{
 Non-stationary smoothing for Gaussian Process Regression in 1D
 }
+\author{
+Julian Faraway, \email{jjf23@bath.ac.uk}
+}

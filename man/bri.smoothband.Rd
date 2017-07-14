@@ -31,3 +31,6 @@ the rougher 95% credibility band
 \description{
 Smoothness bands for Gaussian Process Regression
 }
+\author{
+Julian Faraway, \email{jjf23@bath.ac.uk}
+}

@@ -1,5 +1,6 @@
 #' Convert precision to SD
 #'
+#' @author Julian Faraway, \email{jjf23@bath.ac.uk}
 #' @param prec a precision density
 #' @param internal logical indicating whether this is an internal representation
 #'
@@ -15,6 +16,7 @@ bri.hyper.sd = function(prec,internal=FALSE){
 
 #' Compute a summary from a density
 #'
+#' @author Julian Faraway, \email{jjf23@bath.ac.uk}
 #' @param dens a density
 #'
 #' @return numerical summary
@@ -29,6 +31,7 @@ bri.density.summary = function(dens){
 
 #' Convert precisions to SD in INLA hyperparameter summary
 #'
+#' @author Julian Faraway, \email{jjf23@bath.ac.uk}
 #' @param inla model object
 #'
 #' @return summary of hyperparameters on SD scale (where appropriate)
@@ -54,6 +57,7 @@ bri.hyperpar.summary = function(r){
 
 #' Plot the hyperparameter posteriors
 #'
+#' @author Julian Faraway, \email{jjf23@bath.ac.uk}
 #' @param r an INLA model object
 #' @param together TRUE if densities to be plotted on a single panel
 #'
@@ -90,6 +94,7 @@ bri.hyperpar.plot = function(r,together=TRUE){
 
 #' Plot the posterior densities of the random effects
 #'
+#' @author Julian Faraway, \email{jjf23@bath.ac.uk}
 #' @param r inla model object
 #'
 #' @return a data frame with the densities and group labels
@@ -107,6 +112,7 @@ bri.random.plot = function(r){
 
 #' Plot posterior densities of the fixed effects
 #'
+#' @author Julian Faraway, \email{jjf23@bath.ac.uk}
 #' @param r an inla model object
 #'
 #' @return a data frame containing the densities and parameter labels (invisible)
@@ -129,6 +135,7 @@ bri.fixed.plot = function(r, together=FALSE){
 
 #' Gaussian Process Regression in 1D
 #'
+#' @author Julian Faraway, \email{jjf23@bath.ac.uk}
 #' @param x the predictor vector
 #' @param y the response vector
 #' @param pcprior limites for the penalised complexity prior (optional). If specified should be a vector 
@@ -179,6 +186,7 @@ bri.gpr <- function(x, y, pcprior, nbasis=25, degree=2, alpha=2, xout=x,
 
 #' Smoothness bands for Gaussian Process Regression
 #'
+#' @author Julian Faraway, \email{jjf23@bath.ac.uk}
 #' @param x the predictor vector
 #' @param y the response vector
 #' @param nbasis - number of basis functions for the spline (default is 25)
@@ -241,6 +249,7 @@ bri.smoothband <- function(x, y, nbasis=25, degree=2, alpha=2, xout=x,
 
 #' Non-stationary smoothing for Gaussian Process Regression in 1D
 #'
+#' @author Julian Faraway, \email{jjf23@bath.ac.uk}
 #' @param x the predictor vector
 #' @param y the response vector
 #' @param nbasis - number of basis functions for the spline (default is 25)

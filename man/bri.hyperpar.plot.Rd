@@ -17,3 +17,6 @@ data frame containing the densities
 \description{
 Plot the hyperparameter posteriors
 }
+\author{
+Julian Faraway, \email{jjf23@bath.ac.uk}
+}

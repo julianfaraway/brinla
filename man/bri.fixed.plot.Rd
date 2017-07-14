@@ -15,3 +15,6 @@ a data frame containing the densities and parameter labels (invisible)
 \description{
 Plot posterior densities of the fixed effects
 }
+\author{
+Julian Faraway, \email{jjf23@bath.ac.uk}
+}

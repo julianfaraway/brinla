@@ -2,14 +2,24 @@
 % Please edit documentation in R/YY.R
 \name{bri.tps.prior}
 \alias{bri.tps.prior}
-\title{TPS Prior}
+\title{Construct a thin-plate spline prior}
 \usage{
 bri.tps.prior(mesh, constr = FALSE, extraconstr.int = NULL,
   extraconstr = NULL, theta.mean = 0, theta.prec = 0.001)
 }
 \arguments{
-\item{theta.prec}{}
+\item{mesh}{the mesh to build the model on}
+
+\item{constr}{TRUE if apply an integrate-to-zero constraint. Default FALSE.}
+
+\item{extraconstr.int}{extra field integral constraints}
+
+\item{extraconstr}{direct linear combination constraints on the basis weights}
+
+\item{theta.mean}{prior mean for theta}
+
+\item{theta.prec}{prior precision for theta}
 }
 \description{
-TPS Prior
+Construct a thin-plate spline prior
 }

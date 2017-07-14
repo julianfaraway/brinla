@@ -2,14 +2,31 @@
 % Please edit documentation in R/YY.R
 \name{excursions.brinla}
 \alias{excursions.brinla}
-\title{Excursions}
+\title{Excursion sets and contour credible regions for latent Gaussian models
+A wrapper function for excursions.inla() in excursions package}
 \usage{
 excursions.brinla(result.inla, name = NULL, ind = NULL, method, u, type,
   alpha = 0.05)
 }
 \arguments{
-\item{alpha}{}
+\item{result.inla}{result object from INLA call}
+
+\item{name}{The name of the component for which to do the calculation}
+
+\item{ind}{the indices for the part of a component that should be used in the calculations}
+
+\item{method}{the method for handeling the latent Gaussian structure: 'EB' empirical Bayes; 'QC' quantile correction; 'NI' numerical integration; 'NIQC' numerical integration with quantile correction; 'iNIQC' improved integration with quantle correction}
+
+\item{u}{the excursion or contour level}
+
+\item{type}{the type of region: '>' positive excursions; '<' negative excursions; '!=' contour avoiding function; '=' contour credibility function}
+
+\item{alpha}{specifies the joint probability of an excursion set or contour credible region as 1-alpha}
+}
+\value{
+a list that contains the following arguments: 'E' excursion set, contour credible region, or contour avoiding set with 1-alpha probability; 'F' the excursion function corresponding to the set E; 'G' the excursion function F thresholded at 1-alpha; 'rho' marginal excursion probabilities; 'mean' posterior mean; 'vars' marginal variances
 }
 \description{
-Excursions
+Excursion sets and contour credible regions for latent Gaussian models
+A wrapper function for excursions.inla() in excursions package
 }

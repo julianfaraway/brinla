@@ -15,3 +15,6 @@ a data frame with the densities and group labels
 \description{
 Plot the posterior densities of the random effects
 }
+\author{
+Julian Faraway, \email{jjf23@bath.ac.uk}
+}

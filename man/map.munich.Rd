@@ -7,7 +7,7 @@
 map.munich(results, ...)
 }
 \arguments{
-\item{results}{}
+\item{results}{the vector of values to be shown on the map}
 }
 \description{
 Draw Munich map

@@ -15,3 +15,6 @@ numerical summary
 \description{
 Compute a summary from a density
 }
+\author{
+Julian Faraway, \email{jjf23@bath.ac.uk}
+}
