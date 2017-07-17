@@ -2,12 +2,10 @@
 % Please edit documentation in R/YY.R
 \name{num.knots}
 \alias{num.knots}
-\title{Choose the number of knots
-An internal function for spline.mixed()}
+\title{Choose the number of knots}
 \usage{
 num.knots(x)
 }
 \description{
-Choose the number of knots
 An internal function for spline.mixed()
 }

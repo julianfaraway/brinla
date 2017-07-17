@@ -2,8 +2,7 @@
 % Please edit documentation in R/YY.R
 \name{excursions.brinla}
 \alias{excursions.brinla}
-\title{Excursion sets and contour credible regions for latent Gaussian models
-A wrapper function for excursions.inla() in excursions package}
+\title{Excursion sets and contour credible regions for latent Gaussian models}
 \usage{
 excursions.brinla(result.inla, name = NULL, ind = NULL, method, u, type,
   alpha = 0.05)
@@ -27,6 +26,5 @@ excursions.brinla(result.inla, name = NULL, ind = NULL, method, u, type,
 a list that contains the following arguments: 'E' excursion set, contour credible region, or contour avoiding set with 1-alpha probability; 'F' the excursion function corresponding to the set E; 'G' the excursion function F thresholded at 1-alpha; 'rho' marginal excursion probabilities; 'mean' posterior mean; 'vars' marginal variances
 }
 \description{
-Excursion sets and contour credible regions for latent Gaussian models
 A wrapper function for excursions.inla() in excursions package
 }

@@ -6,7 +6,7 @@
 #' @param theta.prec the fixed precision of the Gaussian prior on the smoothing function (default value is 0.01)
 #' @param type the type of the Gaussian prior on the smoothing function: 'indpt' independent Gaussian priors; 'spde' SPDE prior
 #'
-#' @return an object for the 'model' option in inla()
+#' @return an object for the 'model' option used in inla()
 #' @export
 bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt", "spde")){
   require('splines')
@@ -75,11 +75,8 @@ bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt
 #' @param main an overall title for the plot
 #' @param hpd TRUE if highest posterior density (HPD) interval is plotted (FALSE by default) 
 #'
-#' @return 
+#' @return A plot of posterior mean and credible band for a nonlinear function estimated by INLA
 #' @export
-
-## Function to plot credible band for nonlinear function
-
 bri.band.ggplot <- function(result, name = NULL, x = NULL, alpha = 0.05, ind = NULL, type = c('random', 'fitted', 'linear', 'lincomb'), xlab = NULL, ylab = NULL, main = NULL,  hpd = FALSE)
 {
   require(ggplot2)
@@ -175,9 +172,8 @@ bri.band.ggplot <- function(result, name = NULL, x = NULL, alpha = 0.05, ind = N
 #' @param hpd TRUE if highest posterior density (HPD) interval is plotted (FALSE by default) 
 #' @param gray.band TRUE (default) if the credible band is filled with gray color
 #'
-#' @return
+#' @return A plot of posterior mean and credible band for a nonlinear function estimated by INLA
 #' @export
-
 bri.band.plot <- function(result, name = NULL, alpha = 0.05, ind = NULL, x = NULL, xlab = NULL, ylab = NULL, main = NULL, sub = NULL, xlim = NULL, ylim = NULL, cex.lab = 1.5, cex.axis = 1.5, type = c('random', 'fitted', 'linear'), hpd = FALSE, gray.band = TRUE)
 {
   result
@@ -263,7 +259,7 @@ bri.band.plot <- function(result, name = NULL, alpha = 0.05, ind = NULL, x = NUL
 #' @param theta.mean prior mean for theta
 #' @param theta.prec prior precision for theta
 #'
-#' @return
+#' @return an object for the 'model' option used in inla()
 #' @export
 bri.tps.prior <- function(
   mesh, constr = FALSE, 
@@ -281,7 +277,8 @@ bri.tps.prior <- function(
 }
 
 #' Excursion sets and contour credible regions for latent Gaussian models
-#' A wrapper function for excursions.inla() in excursions package
+#' 
+#' @description A wrapper function for excursions.inla() in excursions package
 #' @param result.inla result object from INLA call
 #' @param name The name of the component for which to do the calculation
 #' @param ind the indices for the part of a component that should be used in the calculations
@@ -366,7 +363,7 @@ bri.excursions.ggplot <- function(res.exc, xlab = NULL, ylab = NULL, main = NULL
 #'
 #' @param results the vector of values to be shown on the map
 #'
-#' @return 
+#' @return A map of Munich with color scale
 #' @export				  
 
 map.munich = function(results, ...)
@@ -641,8 +638,9 @@ map.munich.testing = function()
 }
 
 #' Choose the number of knots
-#' An internal function for spline.mixed()
-#' @return
+#' 
+#' @description An internal function for spline.mixed()
+#' @return 
 #' @export
 
 num.knots <- function(x){
@@ -652,7 +650,8 @@ num.knots <- function(x){
 }
 
 #' Creat the vector of default knots
-#' An internal function for spline.mixed()
+#' 
+#' @description An internal function for spline.mixed()
 #' @return
 #' @export
 

@@ -2,12 +2,10 @@
 % Please edit documentation in R/YY.R
 \name{default.knots}
 \alias{default.knots}
-\title{Creat the vector of default knots
-An internal function for spline.mixed()}
+\title{Creat the vector of default knots}
 \usage{
 default.knots(x, num.knots)
 }
 \description{
-Creat the vector of default knots
 An internal function for spline.mixed()
 }

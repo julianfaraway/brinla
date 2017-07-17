@@ -27,6 +27,9 @@ bri.band.ggplot(result, name = NULL, x = NULL, alpha = 0.05, ind = NULL,
 
 \item{hpd}{TRUE if highest posterior density (HPD) interval is plotted (FALSE by default)}
 }
+\value{
+A plot of posterior mean and credible band for a nonlinear function estimated by INLA
+}
 \description{
 Plot credible band for a nonlinear function using ggplot()
 }

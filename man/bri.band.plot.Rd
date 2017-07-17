@@ -38,6 +38,9 @@ bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL, x = NULL,
 
 \item{gray.band}{TRUE (default) if the credible band is filled with gray color}
 }
+\value{
+A plot of posterior mean and credible band for a nonlinear function estimated by INLA
+}
 \description{
 Plot credible band for a nonlinear function using plot()
 }

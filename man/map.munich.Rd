@@ -9,6 +9,9 @@ map.munich(results, ...)
 \arguments{
 \item{results}{the vector of values to be shown on the map}
 }
+\value{
+A map of Munich with color scale
+}
 \description{
 Draw Munich map
 }

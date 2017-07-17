@@ -20,6 +20,9 @@ bri.tps.prior(mesh, constr = FALSE, extraconstr.int = NULL,
 
 \item{theta.prec}{prior precision for theta}
 }
+\value{
+an object for the 'model' option used in inla()
+}
 \description{
 Construct a thin-plate spline prior
 }

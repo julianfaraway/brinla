@@ -19,7 +19,7 @@ bri.adapt.prior(x, degree = 3, nknot = 5, theta.prec = 0.01,
 \item{type}{the type of the Gaussian prior on the smoothing function: 'indpt' independent Gaussian priors; 'spde' SPDE prior}
 }
 \value{
-an object for the 'model' option in inla()
+an object for the 'model' option used in inla()
 }
 \description{
 Construct a random walk prior for adaptive smoothing
