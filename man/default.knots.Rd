@@ -6,6 +6,9 @@
 \usage{
 default.knots(x, num.knots)
 }
+\value{
+quantiles
+}
 \description{
 An internal function for spline.mixed()
 }

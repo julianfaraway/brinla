@@ -372,28 +372,7 @@ map.munich = function(results, ...)
   my.drawmap(x, munich.bnd, regionvar=1, plotvar=2, ...)
 }
 
-#' Draw map
-#'
-#' @param data 
-#' @param map 
-#' @param regionvar 
-#' @param plotvar 
-#' @param limits 
-#' @param cols 
-#' @param nrcolors 
-#' @param swapcolors 
-#' @param pcat 
-#' @param hcl.par 
-#' @param hsv.par 
-#' @param legend 
-#' @param drawnames 
-#' @param cex.names 
-#' @param cex.legend 
-#' @param mar.min 
-#' @param ... 
-#'
-#' @return
-#' @export
+#' Draw map (internal function)
 
 my.drawmap = function (data, map, regionvar = 2, plotvar = 3, limits, cols = "grey", nrcolors = 100, swapcolors = TRUE, pcat = FALSE, hcl.par = list(h = c(130, 25), c = 100, l = c(90, 70)), hsv.par = list(s = 1, v = 1), legend = TRUE, drawnames = FALSE, cex.names = 0.7, cex.legend = 1.5, mar.min = 2, ...) 
 {
@@ -613,35 +592,12 @@ my.drawmap = function (data, map, regionvar = 2, plotvar = 3, limits, cols = "gr
   return(invisible())
 }
 
-#' Map testing
-#'
-#' @return
-#' @export
 
-map.munich.testing = function()
-{
-  a1 = c(0, 91, 135, 136, 137, 297)
-  a2 = c(18, 13, 17 ,19, 78, 90, 332, 370) 
-  a3 = c(378, 116, 117, 214, 247, 250, 251, 252, 253, 254, 274, 379)
-  
-  par(mfrow=c(2,2))
-  x = rep(0, 380)
-  x[a1+1] = 1
-  map.munich(x, cols="grey")
-  x = rep(0, 380)
-  x[a2+1] = 1
-  map.munich(x, cols="grey")
-  x = rep(0, 380)
-  x[a3+1] = 1
-  map.munich(x, cols="grey")
-  
-}
 
 #' Choose the number of knots
 #' 
 #' @description An internal function for spline.mixed()
-#' @return 
-#' @export
+#' @return number of knots
 
 num.knots <- function(x){
   x.uniq <- unique(x)
@@ -652,8 +608,7 @@ num.knots <- function(x){
 #' Creat the vector of default knots
 #' 
 #' @description An internal function for spline.mixed()
-#' @return
-#' @export
+#' @return quantiles
 
 default.knots <- function(x,num.knots)
 {

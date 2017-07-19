@@ -2,7 +2,7 @@
 % Please edit documentation in R/YY.R
 \name{my.drawmap}
 \alias{my.drawmap}
-\title{Draw map}
+\title{Draw map (internal function)}
 \usage{
 my.drawmap(data, map, regionvar = 2, plotvar = 3, limits, cols = "grey",
   nrcolors = 100, swapcolors = TRUE, pcat = FALSE, hcl.par = list(h =
@@ -10,41 +10,6 @@ my.drawmap(data, map, regionvar = 2, plotvar = 3, limits, cols = "grey",
   legend = TRUE, drawnames = FALSE, cex.names = 0.7, cex.legend = 1.5,
   mar.min = 2, ...)
 }
-\arguments{
-\item{data}{}
-
-\item{map}{}
-
-\item{regionvar}{}
-
-\item{plotvar}{}
-
-\item{limits}{}
-
-\item{cols}{}
-
-\item{nrcolors}{}
-
-\item{swapcolors}{}
-
-\item{pcat}{}
-
-\item{hcl.par}{}
-
-\item{hsv.par}{}
-
-\item{legend}{}
-
-\item{drawnames}{}
-
-\item{cex.names}{}
-
-\item{cex.legend}{}
-
-\item{mar.min}{}
-
-\item{...}{}
-}
 \description{
-Draw map
+Draw map (internal function)
 }

@@ -6,6 +6,9 @@
 \usage{
 num.knots(x)
 }
+\value{
+number of knots
+}
 \description{
 An internal function for spline.mixed()
 }
