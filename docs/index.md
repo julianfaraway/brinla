@@ -2,19 +2,19 @@
 
 A forthcoming book by [Xiaofeng Wang](https://filer.case.edu/xxw17/), [Ryan Yue](http://zicklin.baruch.cuny.edu/faculty/profiles/yu-ryan-yue) and [Julian Faraway](http://people.bath.ac.uk/jjf23/)
 
-## Chapters, scripts and output
+## Chapter scripts
 
-1. Introduction: [intro.R](scripts/intro.R) with [output](scripts/intro.html)
-2. Theory of INLA
-3. Linear Regression
-4. Generalized Linear Models
-5. Generalized Linear Mixed Models [glmm.R](scripts/glmm.R) with [output](scripts/glmm.html)
-6. Survival Analysis
-7. Random Walk Models for Smoothing
-8. Gaussian Process Regression [gpr.R](scripts/gpr.R) with [output](scripts/gpr.html)
-9. Generalized Additive Models
-10. Errors-in-Variables Regression
-11. Miscellaneous Topics
+1. Introduction: [intro.R](scripts/intro.R) 
+2. Theory of INLA: [inla.R](scripts/inla.R)
+3. Linear Regression: [blr.R](scripts/blr.R)
+4. Generalized Linear Models: [glm.R](scripts/glm.R)
+5. Generalized Linear Mixed Models [glmm.R](scripts/glmm.R) 
+6. Survival Analysis: [surv.R](scripts/surv.R)
+7. Random Walk Models for Smoothing: [npr.R](scripts/npr.R)
+8. Gaussian Process Regression [gpr.R](scripts/gpr.R) 
+9. Generalized Additive Models: [gam.R](scripts/gam.R)
+10. Errors-in-Variables Regression: [eiv.R](scripts/eiv.R)
+11. Miscellaneous Topics: [misc.R](scripts/misc.R)
 
 
 ## R package
@@ -25,3 +25,7 @@ to support the book.
 ## Examples
 
 Here are some [preview examples](http://people.bath.ac.uk/jjf23/brinla/)
+
+## Purchase
+
+The book can be purchased at the usual online outlets or the [publishers](https://www.crcpress.com/Bayesian-Regression-Modeling-with-INLA/Wang-Ryan-Faraway/p/book/9781498727259)
