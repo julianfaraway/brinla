@@ -1,0 +1,26 @@
+#' painrelief
+#'
+#'
+#' from an experiment examining the effects of codeine and acupuncture on post-operative dental pain in male subjects (Kutner et al., 2004)
+#'
+#' @docType data
+#'
+#' @usage data(painrelief)
+#'
+#' @format A data frame with 4 columns and 32 rows. The columns are:
+#' \itemize{
+#' \item{PainLevel: }{Pain level from 1 to 8.}
+#' \item{Codeine: }{Whether use codeine or not. 1: a codeine capsule; 2: a sugar capsule.}
+#' \item{Acupuncture: }{Acupuncture method. 1: apply to 2 inactive acupuncture points; 2: apply to 2 active acupuncture points.}
+#' \item{Relief: }{Pain relief score.}
+#' }
+#' @details The study used a randomized block design with two treatment factors occur- ring in a factorial structure. Both treatment factors have two levels. The variable Codeine has two groups: take a codeine capsule or a sugar capsule. The variable Acupuncture has two groups: apply to two inactive acupuncture points or two active acupuncture points. 
+#'
+#' @keywords datasets
+#'
+#' @references Kutner, M. H., C. J. Nachtsheim, J. Neter, and W. Li (2004). Applied Linear Statistical Models (5th ed.). New York: McGraw-Hill Irwin.
+#'
+#'
+#' @examples
+#' data(painrelief)
+"painrelief"

@@ -1,18 +1,20 @@
 #' linear regression model Baysian residual plot
 #'
-#' @param inla.obj 
-#' @param covariate 
-#' @param m 
-#' @param pmedian 
-#' @param smooth 
-#' @param xlab 
-#' @param cex.lab 
-#' @param cex.axis 
-#' @param ylab 
-#' @param main 
+#' @author Xiaofeng Wang, \email{wangx6@ccf.org}
+#' @param inla.obj an object of class "inla". 
+#' @param covariate the covariate of interest for the residual plot.
+#' @param m the size of posterior samples to be generated from the posterior distribution.
+#' @param pmedian if pmedian = TRUE, posterior medians of Bayesian residuals will be calculated.
+#' @param smooth if smooth = TRUE, a nonparametric smooth curve will be added.
+#' @param xlab a title for the x axis.
+#' @param cex.lab The magnification to be used for x and y labels relative to the current setting of cex.
+#' @param cex.axis The magnification to be used for x and y labels relative to the current setting of cex.
+#' @param ylab a title for the y axis.
+#' @param main an overall title for the plot.
 #' @param ... 
-#'
-#' @return
+#' 
+#' @details generate a Bayesian residual index plot or a plot of the residual versus the predictor for linear regression using INLA.
+#' @return a list consisting of residuals (resid), the covariate used for plot (covariate), the response variable (y)
 #' @export
 bri.lmresid.plot <- function(inla.obj, covariate = NULL, m = 1000, pmedian = FALSE, smooth = FALSE, xlab = NULL, cex.lab = 1.25, cex.axis = 1.25, ylab = "Bayesian residual", main = "",...){	
   if(class(inla.obj) != "inla") stop("an 'inla' object is needed!")
@@ -56,24 +58,25 @@ bri.lmresid.plot <- function(inla.obj, covariate = NULL, m = 1000, pmedian = FAL
 }
 
 
-#' Poisson regression model Baysian residual plot
+#' Baysian Pearson residuals for Poisson regression using INLA
 #'
-#' @param inla.obj 
-#' @param covariate 
-#' @param m 
-#' @param pmedian 
-#' @param smooth 
-#' @param xlab 
-#' @param cex.lab 
-#' @param cex.axis 
-#' @param ylab 
-#' @param ylim 
-#' @param main 
+#' @author Xiaofeng Wang, \email{wangx6@ccf.org}
+#' @param inla.obj an object of class "inla". 
+#' @param covariate the covariate of interest for the residual plot.
+#' @param m the size of posterior samples to be generated from the posterior distribution.
+#' @param pmedian if pmedian = TRUE, posterior medians of Bayesian residuals will be calculated.
+#' @param plot if plot = TRUE, a Bayesian residual plot will be generated
+#' @param smooth if smooth = TRUE, a nonparametric smooth curve will be added.
+#' @param xlab a title for the x axis.
+#' @param cex.lab The magnification to be used for x and y labels relative to the current setting of cex.
+#' @param cex.axis The magnification to be used for x and y labels relative to the current setting of cex.
+#' @param ylab a title for the y axis.
+#' @param main an overall title for the plot.
 #' @param ... 
-#'
-#' @return
+#' @details compute Bayesian Pearson residuals, and generate a index plot or a plot of the residual versus the predictor for Bayesian Possion regression using INLA.
+#' @return a list consisting of residuals (resid), the covariate used for plot (covariate), the response variable (y)
 #' @export
-bri.Pois.resid.plot <- function(inla.obj, covariate = NULL, m = 1000, pmedian = FALSE, smooth = FALSE, xlab = NULL, cex.lab = 1.25, cex.axis = 1.25, ylab = "Bayesian residual", ylim = NULL, main = "",...){	
+bri.Pois.resid <- function(inla.obj, covariate = NULL, m = 1000, pmedian = FALSE, plot = FALSE, smooth = FALSE, xlab = NULL, cex.lab = 1.25, cex.axis = 1.25, ylab = "Bayesian residual", ylim = NULL, main = "",...){	
   if(class(inla.obj) != "inla") stop("an 'inla' object is needed!")
   if(inla.obj$.args$family != "poisson") stop("the function only supports Poisson GLM!")
   # Get a single random draw of posterior distribution of parameters
@@ -101,44 +104,47 @@ bri.Pois.resid.plot <- function(inla.obj, covariate = NULL, m = 1000, pmedian = 
   } else {
     resid <- apply(resid.sample, 1, mean)
   }
-  
-  if (is.null(covariate)) {
-    covariate <- seq(1: length(resid))
-    xlab <- "Index"		
-  } else {
-    if (length(resid) != length(covariate))
-      stop("the 'covariate' variable does not match with the residual object!")		
-    if (is.null(xlab)) xlab <- "Covariate"
-  }
-  if (is.null(ylim)) {ylim <- c(min(resid), max(resid))}
-  if (smooth){
-    res.dat <- data.frame(covariate = covariate, resid = resid)
-    res.smooth.inla <- inla(resid ~ -1 + f(covariate, model = 'rw2', constr = FALSE), data = res.dat)
-    bri.band.plot(res.smooth.inla, name = 'covariate', alpha = 0.05, xlab = xlab, ylab = ylab, main = main, cex.lab = cex.lab, cex.axis = cex.axis, type = 'random', ylim = ylim)
-    points(res.dat$covariate, res.dat$resid)		
-  } else{
-    plot(covariate, resid, cex.lab = cex.lab, cex.axis = cex.axis, xlab = xlab, main = main, ylab = ylab, ylim = ylim, ...)
-  }
+  if (plot) {
+    if (is.null(covariate)) {
+      covariate <- seq(1: length(resid))
+      xlab <- "Index"		
+    } else {
+      if (length(resid) != length(covariate))
+        stop("the 'covariate' variable does not match with the residual object!")		
+      if (is.null(xlab)) xlab <- "Covariate"
+    }
+    if (is.null(ylim)) {ylim <- c(min(resid), max(resid))}
+    if (smooth){
+      res.dat <- data.frame(covariate = covariate, resid = resid)
+      res.smooth.inla <- inla(resid ~ -1 + f(covariate, model = 'rw2', constr = FALSE), data = res.dat)
+      bri.band.plot(res.smooth.inla, name = 'covariate', alpha = 0.05, xlab = xlab, ylab = ylab, main = main, cex.lab = cex.lab, cex.axis = cex.axis, type = 'random', ylim = ylim)
+      points(res.dat$covariate, res.dat$resid)		
+    } else{
+      plot(covariate, resid, cex.lab = cex.lab, cex.axis = cex.axis, xlab = xlab, main = main, ylab = ylab, ylim = ylim, ...)
+    }
+  } 	
   return(invisible(list(resid = resid, covariate = covariate, y = y))) 	
 }
 
-#' beta regression model Baysian residual plot
-#' @param inla.obj 
-#' @param covariate 
-#' @param m 
-#' @param pmedian 
-#' @param smooth 
-#' @param xlab 
-#' @param cex.lab 
-#' @param cex.axis 
-#' @param ylab 
-#' @param ylim 
-#' @param main 
-#' @param ... 
+#' Baysian residuals for beta regression using INLA
 #'
-#' @return
+#' @author Xiaofeng Wang, \email{wangx6@ccf.org}
+#' @param inla.obj an object of class "inla". 
+#' @param covariate the covariate of interest for the residual plot.
+#' @param m the size of posterior samples to be generated from the posterior distribution.
+#' @param pmedian if pmedian = TRUE, posterior medians of Bayesian residuals will be calculated.
+#' @param plot if plot = TRUE, a Bayesian residual plot will be generated
+#' @param smooth if smooth = TRUE, a nonparametric smooth curve will be added.
+#' @param xlab a title for the x axis.
+#' @param cex.lab The magnification to be used for x and y labels relative to the current setting of cex.
+#' @param cex.axis The magnification to be used for x and y labels relative to the current setting of cex.
+#' @param ylab a title for the y axis.
+#' @param main an overall title for the plot.
+#' @param ... 
+#' @details compute Bayesian residuals, and generate a index plot or a plot of the residual versus the predictor for Bayesian beta regression using INLA.
+#' @return a list consisting of residuals (resid), the covariate used for plot (covariate), the response variable (y)
 #' @export
-bri.beta.resid.plot <- function(inla.obj, covariate = NULL, m = 1000, pmedian = FALSE, smooth = FALSE, xlab = NULL, cex.lab = 1.25, cex.axis = 1.25, ylab = "Bayesian residual", ylim = NULL, main = "",...){	
+bri.beta.resid <- function(inla.obj, covariate = NULL, m = 1000, pmedian = FALSE, plot = FALSE, smooth = FALSE, xlab = NULL, cex.lab = 1.25, cex.axis = 1.25, ylab = "Bayesian residual", ylim = NULL, main = "",...){	
   if(class(inla.obj) != "inla") stop("an 'inla' object is needed!")
   if(inla.obj$.args$family != "beta") stop("the function only supports beta GLM!")
   # Get a single random draw of posterior distribution of parameters
@@ -164,35 +170,39 @@ bri.beta.resid.plot <- function(inla.obj, covariate = NULL, m = 1000, pmedian = 
     resid <- apply(resid.sample, 1, mean)
   }
   
-  if (is.null(covariate)) {
-    covariate <- seq(1: length(resid))
-    xlab <- "Index"		
-  } else {
-    if (length(resid) != length(covariate))
-      stop("the 'covariate' variable does not match with the residual object!")		
-    if (is.null(xlab)) xlab <- "Covariate"
-  }
-  if (is.null(ylim)) {ylim <- c(min(resid), max(resid))}
-  if (smooth){
-    res.dat <- data.frame(covariate = covariate, resid = resid)
-    res.smooth.inla <- inla(resid ~ -1 + f(covariate, model = 'rw2', constr = FALSE), data = res.dat)
-    bri.band.plot(res.smooth.inla, name = 'covariate', alpha = 0.05, xlab = xlab, ylab = ylab, main = main, cex.lab = cex.lab, cex.axis = cex.axis, type = 'random', ylim= ylim)
-    points(res.dat$covariate, res.dat$resid)		
-  } else{
-    plot(covariate, resid, cex.lab = cex.lab, cex.axis = cex.axis, xlab = xlab, main = main, ylab = ylab, ylim = ylim, ...)
-  }
+  if (plot) {
+    if (is.null(covariate)) {
+      covariate <- seq(1: length(resid))
+      xlab <- "Index"		
+    } else {
+      if (length(resid) != length(covariate))
+        stop("the 'covariate' variable does not match with the residual object!")		
+      if (is.null(xlab)) xlab <- "Covariate"
+    }
+    if (is.null(ylim)) {ylim <- c(min(resid), max(resid))}
+    if (smooth){
+      res.dat <- data.frame(covariate = covariate, resid = resid)
+      res.smooth.inla <- inla(resid ~ -1 + f(covariate, model = 'rw2', constr = FALSE), data = res.dat)
+      bri.band.plot(res.smooth.inla, name = 'covariate', alpha = 0.05, xlab = xlab, ylab = ylab, main = main, cex.lab = cex.lab, cex.axis = cex.axis, type = 'random', ylim= ylim)
+      points(res.dat$covariate, res.dat$resid)		
+    } else{
+      plot(covariate, resid, cex.lab = cex.lab, cex.axis = cex.axis, xlab = xlab, main = main, ylab = ylab, ylim = ylim, ...)
+    }
+  } 	
   return(invisible(list(resid = resid, covariate = covariate, y = y))) 	
 }
 
-#' compute the baseline hazard function in INLA survival models
-#' the function supports Weibull model, Expontenial model and Cox proportional hazards model for right censored data.
-#' @param inla.obj 
-#' @param plot 
-#' @param cex.lab 
-#' @param cex.axis 
+
+
+#' Plot the baseline hazard functions for survival models using INLA
+#' @param inla.obj an object of class "inla". 
+#' @param plot if plot = TRUE, the plot of the baseline hazard functions will be generated.
+#' @param cex.lab The magnification to be used for x and y labels relative to the current setting of cex.
+#' @param cex.axis The magnification to be used for x and y labels relative to the current setting of cex.
 #' @param ... 
 #'
-#' @return
+#' @details The function supports Weibull model, Expontenial model and Cox proportional hazards model for right censored data.
+#' @return A list of evaluated time points (time), and the values of corresponding base line function (basehaz).
 #' @export
 bri.basehaz.plot <- function(inla.obj, plot = TRUE, cex.lab = 1.25, cex.axis = 1.25, ...){
   if(class(inla.obj) != "inla") stop("an 'inla' object is needed!")
@@ -261,16 +271,15 @@ bri.basehaz.plot <- function(inla.obj, plot = TRUE, cex.lab = 1.25, cex.axis = 1
   return(invisible(list(time = eval.point, basehaz = basehaz))) 
 }
 
-#' this function is to obtain the different residuals for inla survival models
-#' the function supports Weibull model, Expontenial model and Cox proportional hazards model for right censored data.
-#' Three types of residuals could be obtained: Cox-Snell residual; Martingale residuals; Deviance residuals. 
+
+#' Compute different Bayesian residuals for survival models using INLA
+#' @param inla.obj an object of class "inla". 
+#' @param time the follow up time for right censored data, 
+#' @param event the status indicator, 1=observed event, 0=right censored event
 #'
-#' @param inla.obj 
-#' @param time 
-#' @param event 
-#'
-#' @return
-#' @export
+#' @details The function supports Weibull model, Expontenial model and Cox proportional hazards model for right censored data. Three types of residuals are obtained: Cox-Snell residual; Martingale residuals; Deviance residuals. 
+#' @return A list of different residuals, and time, event, family information.
+#' @export 
 bri.surv.resid <- function(inla.obj, time, event){
   if(class(inla.obj) != "inla") stop("an 'inla' object is needed!")
   family <- inla.obj$.args$family
@@ -330,13 +339,13 @@ bri.surv.resid <- function(inla.obj, time, event){
 
 #' Cox-Snell residual plot
 #' 
-#' @param resid.obj 
-#' @param lwd 
-#' @param xlab 
-#' @param ylab 
-#' @param main 
-#' @param cex.lab 
-#' @param cex.axis 
+#' @param resid.obj object from bri.surv.resid function
+#' @param lwd the line width, a positive number, defaulting to 2.
+#' @param xlab a title for the x axis.
+#' @param ylab a title for the y axis.
+#' @param main an overall title for the plot.
+#' @param cex.lab The magnification to be used for x and y labels relative to the current setting of cex.
+#' @param cex.axis The magnification to be used for x and y labels relative to the current setting of cex.
 #' @param ... 
 #'
 #' @return
@@ -352,16 +361,16 @@ bri.csresid.plot <- function(resid.obj, lwd = 2, xlab="Cox-Snell Residual", ylab
   abline(0, 1, lty=2)
 }
 
-#' Deviance residual plots
-
-#' @param resid.obj 
-#' @param covariate 
-#' @param smooth 
-#' @param xlab 
-#' @param ylab 
-#' @param main 
-#' @param cex.lab 
-#' @param cex.axis 
+#' Deviance residual plot
+#' 
+#' @param resid.obj object from bri.surv.resid function
+#' @param covariate the covariate of interest for the residual plot.
+#' @param smooth if smooth = TRUE, a nonparametric smooth curve will be added.
+#' @param xlab a title for the x axis.
+#' @param ylab a title for the y axis.
+#' @param main an overall title for the plot.
+#' @param cex.lab The magnification to be used for x and y labels relative to the current setting of cex.
+#' @param cex.axis The magnification to be used for x and y labels relative to the current setting of cex.
 #' @param ... 
 #'
 #' @return
@@ -389,14 +398,14 @@ bri.dresid.plot <- function(resid.obj, covariate = NULL, smooth = FALSE, xlab = 
 
 #' Martingale Residual plot
 #'
-#' @param resid.obj 
-#' @param covariate 
-#' @param smooth 
-#' @param xlab 
-#' @param ylab 
-#' @param main 
-#' @param cex.lab 
-#' @param cex.axis 
+#' @param resid.obj object from bri.surv.resid function
+#' @param covariate the covariate of interest for the residual plot.
+#' @param smooth if smooth = TRUE, a nonparametric smooth curve will be added.
+#' @param xlab a title for the x axis.
+#' @param ylab a title for the y axis.
+#' @param main an overall title for the plot.
+#' @param cex.lab The magnification to be used for x and y labels relative to the current setting of cex.
+#' @param cex.axis The magnification to be used for x and y labels relative to the current setting of cex.
 #' @param ... 
 #'
 #' @return
@@ -422,7 +431,69 @@ bri.mresid.plot <- function(resid.obj, covariate = NULL, smooth = FALSE, xlab = 
 }
 
 
+#' Density estimation using INLA
+#'
+#' @param x the data from which the estimate is to be computed.
+#' @param m the number of equally spaced points at which the density is to be estimated.
+#' @param from,to the left and right-most points of the grid at which the density is to be estimated.
+#' @param cut by default, the values of from and to are cut * diff(range(x)) beyond the extremes of the data.
+#' @param diagonal An extra constant added to the diagonal of the precision matrix in INLA.
+#' @param constr A boolean variable indicating whater to set a sum to 0 constraint on the term.
+#' @param ... 
+#'
+#' @return a list containing the following components: x - the n coordinates of the points where the density is estimated; y - the estimated density values; y.lower - the estimated 2.5 percentile of density; y.lower - the estimated 97.5 percentile of density.
+#' @export
 
+bri.density <- function(x, m = 101, from, to, cut = 0.1, diagonal = 1e-03, constr = T, ...){
+  if (any(is.na(x))) stop("'x' contains missing values!")
+  if (missing(from)) from <- min(x) - cut * diff(range(x))
+  if (missing(to)) to <- max(x) + cut * diff(range(x))
+  
+  Gmatrix <- function(x, sparse = TRUE){
+    if (any(is.na(x))) stop("'x' contains missing values!")
+    x <- sort(x)
+    n <- length(x)
+    d <- diff(x)
+    d <- c(Inf, Inf, d, Inf, Inf)
+    k <- 3:(n + 2)
+    g <- 2/((d[k - 1]^2) * (d[k - 2] + d[k - 1])) + 2/(d[k - 1]*d[k]) * (1/d[k - 1] + 1/d[k]) + 2/((d[k]^2) * (d[k] + d[k + 1]))
+    k <- 4:(n + 2)
+    g1 <- -2/(d[k - 1]^2) * (1/d[k - 2] + 1/d[k])
+    k <- 5:(n + 2)
+    g2 <- 2/(d[k - 2] * d[k - 1] * (d[k - 2]+d[k - 1]))
+    G <- diag(g)
+    G[row(G) == col(G) + 1] <- g1
+    G[col(G) == row(G) + 1] <- g1
+    G[row(G) == col(G) + 2] <- g2
+    G[col(G) == row(G) + 2] <- g2
+    if (sparse == TRUE) G <- as(G, "dgTMatrix")
+    return(G)
+  }
+  
+  bins=seq(from, to, length.out = m)
+  x.bins <- hist(x, breaks = bins, plot=FALSE)
+  x.bins.root <- sqrt(x.bins$counts+1/4)
+  idx <- 1:length(x.bins.root)
+  Q <- Gmatrix(idx)
+  inla.fit <- inla(x.bins.root ~ f(idx, model = "generic0", Cmatrix = Q, 
+                                   diagonal = diagonal, constr = constr), 
+                   data = as.data.frame(list(x.bins.root = x.bins.root, idx = idx)), 
+                   control.predictor = list(compute = T))
+  inla.est <- inla.fit$summary.linear.predictor[,1]
+  inla.lower <- inla.fit$summary.linear.predictor[,3]
+  inla.upper <- inla.fit$summary.linear.predictor[,5]
+  SimpsonInt <- function (x, f, subdivisions = 256){
+    ap <- approx(x, f, n = 2 * subdivisions + 1)
+    integral <- diff(ap$x)[1] * (ap$y[2 * (1:subdivisions) - 1] 
+                                 + 4 * ap$y[2 * (1:subdivisions)] + ap$y[2 * (1:subdivisions) + 1])/3
+    return(sum(integral))
+  }
+  normalized <- SimpsonInt(x.bins$mids, inla.est^2)
+  f <- inla.est^2/normalized
+  f.lower <- inla.lower^2/normalized
+  f.upper <- inla.upper^2/normalized
+  return(structure(list(x = x.bins$mids, y = f, y.lower= f.lower, y.upper=f.upper)))	  
+}
 
 
 
