@@ -25,8 +25,8 @@ bri.smoothband(x, y, nbasis = 25, degree = 2, alpha = 2, xout = x,
 \item{rho0}{- prior mean for the range}
 }
 \value{
-list consisting of xout, the posterior mean, the smoother 95% credibility band, 
-the rougher 95% credibility band
+list consisting of xout, the posterior mean, the smoother 95\% credibility band, 
+the rougher 95\% credibility band
 }
 \description{
 Smoothness bands for Gaussian Process Regression

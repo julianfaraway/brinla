@@ -28,8 +28,8 @@ of the form c(r,s) where P(range < r = 0.05) and P(SD(y) > s = 0.05)}
 \item{rho0}{- prior mean for the range}
 }
 \value{
-list consisting of xout, the posterior mean, the lower 95% credibility band, 
-the upper 95% credibility band and the INLA object containing the fit
+list consisting of xout, the posterior mean, the lower 95\% credibility band, 
+the upper 95\% credibility band and the INLA object containing the fit
 }
 \description{
 Gaussian Process Regression in 1D

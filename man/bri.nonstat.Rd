@@ -23,8 +23,8 @@ bri.nonstat(x, y, nbasis = 25, sbasis = 5, degree = 2, alpha = 2,
 \item{xout}{- grid on which posterior will be calculated (default is x)}
 }
 \value{
-list consisting of xout, the posterior mean, the lower 95% credibility band, 
-the upper 95% credibility band and the INLA object containing the fit
+list consisting of xout, the posterior mean, the lower 95\% credibility band, 
+the upper 95\% credibility band and the INLA object containing the fit
 }
 \description{
 Non-stationary smoothing for Gaussian Process Regression in 1D

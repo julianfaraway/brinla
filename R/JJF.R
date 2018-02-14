@@ -147,8 +147,8 @@ bri.fixed.plot = function(r, together=FALSE){
 #' @param sigma0 - prior mean for the signal SD (default is SD(y))
 #' @param rho0 - prior mean for the range
 #'
-#' @return list consisting of xout, the posterior mean, the lower 95% credibility band, 
-#' the upper 95% credibility band and the INLA object containing the fit
+#' @return list consisting of xout, the posterior mean, the lower 95\% credibility band, 
+#' the upper 95\% credibility band and the INLA object containing the fit
 #' @export
 bri.gpr <- function(x, y, pcprior, nbasis=25, degree=2, alpha=2, xout=x,
                     sigma0=sd(y), rho0 = 0.25*(max(x) - min(x))){
@@ -196,8 +196,8 @@ bri.gpr <- function(x, y, pcprior, nbasis=25, degree=2, alpha=2, xout=x,
 #' @param sigma0 - prior mean for the signal SD (default is SD(y))
 #' @param rho0 - prior mean for the range
 #'
-#' @return list consisting of xout, the posterior mean, the smoother 95% credibility band, 
-#' the rougher 95% credibility band 
+#' @return list consisting of xout, the posterior mean, the smoother 95\% credibility band, 
+#' the rougher 95\% credibility band 
 #' @export
 bri.smoothband <- function(x, y, nbasis=25, degree=2, alpha=2, xout=x,
                            sigma0=sd(y), rho0 = 0.25*(max(x) - min(x))){
@@ -258,8 +258,8 @@ bri.smoothband <- function(x, y, nbasis=25, degree=2, alpha=2, xout=x,
 #' @param alpha - controls shape of the GP kernel (default is 2) - 0 < alpha <=2 is possible
 #' @param xout - grid on which posterior will be calculated (default is x)
 #'
-#' @return list consisting of xout, the posterior mean, the lower 95% credibility band, 
-#' the upper 95% credibility band and the INLA object containing the fit
+#' @return list consisting of xout, the posterior mean, the lower 95\% credibility band, 
+#' the upper 95\% credibility band and the INLA object containing the fit
 #' @export
 
 bri.nonstat <- function(x, y, nbasis=25, sbasis=5, degree=2, alpha=2, xout=x,
