@@ -1,10 +1,7 @@
-library(brinla)
+# Errors-in-variables regression
+library(INLA); library(brinla)
 
-# Introduction
-
-
-# Classical Errors-in-Variables Models
-
+# simulation a dataset with heteroscedatic measurment error
 set.seed(5)
 n = 100
 beta0 = 1
@@ -20,9 +17,12 @@ w <- x + rnorm(n, sd = 1/sqrt(prec.u * d))
 ## generate the response from the true model with the unobserved x
 y <- beta0 + beta1*x + rnorm(n, sd = 1/sqrt(prec.y))
 sim.data <- data.frame(y, w, d)
+
+## naive method using INLA
 sim.inla <- inla(y ~ w, data = sim.data, family = "gaussian")
-summary(sim.inla)
+# summary(sim.inla)
 round(sim.inla$summary.fixed, 4)
+
 ## set initial values of hyperparameters
 init.prec.u <- prec.u
 init.prec.x <- var(w) - 1/prec.u
@@ -41,20 +41,32 @@ formula = y ~ f(w, model = "mec", scale = d, values = w,
 		prec.u = list(prior = "loggamma", param = prior.prec.u, initial = log(init.prec.u), fixed = FALSE),
 		mean.x = list(prior = "gaussian", initial = 0, fixed = TRUE),
 		prec.x = list(prior = "loggamma", param = prior.prec.x, initial = log(init.prec.x), fixed = FALSE)))
+
+# fit the mec model
 sim.mec.inla <- inla(formula, data = sim.data, family = "gaussian",
 	control.family = list(hyper = list(prec = list(param = prior.prec.y, initial = log(init.prec.y), fixed=FALSE))),
 	control.fixed = list(mean.intercept = prior.beta[1], prec.intercept = prior.beta[2]))
-summary(sim.mec.inla)
+# summary(sim.mec.inla)
+round(sim.mec.inla$summary.fixed, 4)
+round(sim.mec.inla$summary.hyperpar, 4)
+
+# Plot the results
 plot(w, y, xlim=c(-4, 4), col= "grey")
 curve(1 + 5*x, -4,4, add=TRUE, lwd=2)
 curve(sim.mec.inla$summary.fixed$mean + sim.mec.inla$summary.hyperpar$mean[2]*x, -4,4, add=TRUE, lwd=2, lty = 5)
 curve(sim.inla$summary.fixed$mean[1] + sim.inla$summary.fixed$mean[2]*x, -4,4, add=TRUE, lwd=2, lty = 4)
+
+# ---------------------------
+# framingham study from Carroll
+
+# Read the data
 data(framingham, package = "brinla")
 fram <- subset(framingham, select = c("AGE", "SMOKE", "FIRSTCHD"))
 fram$W1 <- log((framingham$SBP21 + framingham$SBP22)/2 - 50)
 fram$W2 <- log((framingham$SBP31 + framingham$SBP32)/2 - 50)
 fram$W <- (fram$W1 + fram$W2)/2
-# Set prior paramters
+
+# Set priors
 prior.beta <- c(0, 0.01)
 prior.lambda <- c(0, 0.01)
 # estimate initial values of precision parameters 
@@ -62,6 +74,9 @@ prec.u <- 1/(var(fram$W1 - fram$W2)/2)
 prec.x <- 1/(var((fram$W1 + fram$W2)/2) - (1/4)*(var((fram$W1 - fram$W2)/2)))
 prior.prec.x <- c(prec.x, 1)
 prior.prec.u <- c(prec.u, 1)
+
+# Create the data frame for the joint modeling
+n <- nrow(fram) 
 Y <- matrix(NA, 4*n, 3)
 Y[1:n, 1] <- fram$FIRSTCHD
 Y[n+(1:n), 2] <- rep(0, n)
@@ -84,9 +99,8 @@ fram.jointdata <- data.frame(Y=Y,
                          idx.x=idx.x, weight.x=weight.x,
                          lambda.0=lambda.0, lambda.smoke=lambda.smoke, lambda.age=lambda.age,
                          Ntrials=Ntrials)
-fram.formula <- Y ~  f(beta.x, copy = "idx.x", hyper = list(beta = list(param = prior.beta, fixed = FALSE))) 
-	+ f(idx.x, weight.x, model = "iid", values = 1:n, hyper = list(prec = list(initial = -15, fixed = TRUE))) 
-	+ beta.0 - 1 + beta.smoke + beta.age + lambda.0 + lambda.smoke + lambda.age
+
+fram.formula <- Y ~  f(beta.x, copy = "idx.x", hyper = list(beta = list(param = prior.beta, fixed = FALSE))) + f(idx.x, weight.x, model = "iid", values = 1:n, hyper = list(prec = list(initial = -15, fixed = TRUE))) + beta.0 - 1 + beta.smoke + beta.age + lambda.0 + lambda.smoke + lambda.age
 			 
 fram.mec.inla <- inla(fram.formula, Ntrials = Ntrials, data = fram.jointdata, family = c("binomial", "gaussian", "gaussian"),
        control.family = list(
@@ -105,30 +119,82 @@ fram.mec.inla <- inla(fram.formula, Ntrials = Ntrials, data = fram.jointdata, fa
            prec = list(beta.0=prior.beta[2], beta.smoke=prior.beta[2], beta.age=prior.beta[2], 
                      lambda.0=prior.lambda[2], lambda.smoke=prior.lambda[2], lambda.age=prior.lambda[2]))
 )
+
 fram.mec.inla <-inla.hyperpar(fram.mec.inla)
+# summary(fram.mec.inla)
 round(fram.mec.inla$summary.fixed, 4)
 round(fram.mec.inla$summary.hyperpar, 4)
+plot(fram.mec.inla)
+
+# compare the result with the model ignoring measurement error
 fram.naive.inla <- inla(FIRSTCHD~ SMOKE + AGE + W, family = "binomial", data = fram)
+# summary(fram.naive.inla)
 round(fram.naive.inla$summary.fixed, 4)
 
-# Berkson Errors-in-Variables Models
+# ---------------------------
+# Bronchitis study from Carroll: Berkson Error
 
+# Read the data
 data(bronch, package = "brinla")
+
 bronch1 <- subset(bronch, dust >=1.28)
 round(prop.table(table(bronch1$cbr)),4)
 round(prop.table(table(bronch1$smoking)),4)
 round(c(mean(bronch1$dust), sd(bronch1$dust)), 4)
 round(cor(bronch1$dust, bronch1$expo), 4)
 round(by(bronch1$dust, bronch1$smoking, mean), 4)
+# hist(bronch1$dust)
+
 prior.beta <- c(0, 0.01) 
 prec.u <- 1/1.3
 prior.prec.u <- c(1/1.3, 0.01)
+
+
 bronch.formula <- cbr ~  smoking + expo + f(dust, model="meb", hyper = list(beta = list(param = prior.beta, fixed = FALSE), prec.u = list(param = prior.prec.u, initial = log(prec.u), fixed = FALSE))) 
-bronch.meb.inla <- inla(bronch.formula, data = bronch1, family = "binomial", control.fixed = list(mean.intercept = prior.beta[1], prec.intercept = prior.beta[2], mean = prior.beta[1], prec = prior.beta[2]))
+bronch.meb.inla <- inla(bronch.formula, data = bronch1, family = "binomial",
+       control.fixed = list(mean.intercept = prior.beta[1], prec.intercept = prior.beta[2], mean = prior.beta[1], prec = prior.beta[2]))
 bronch.meb.inla <- inla.hyperpar(bronch.meb.inla)
+# summary(bronch.meb.inla)
 round(bronch.meb.inla$summary.fixed, 4)
 round(bronch.meb.inla$summary.hyperpar, 4)
+
+plot(bronch.meb.inla)
+
+# compare with the model ignoring measurement error
 bronch.naive.inla <- inla(cbr ~ dust + smoking + expo, data = bronch1, family = "binomial",
 control.fixed = list(mean.intercept = prior.beta[1], prec.intercept = prior.beta[2], mean = prior.beta[1], prec = prior.beta[2]))
+# summary(bronch.naive.inla)
 round(bronch.naive.inla$summary.fixed, 4)
-sessionInfo()
+
+
+# Using copy feature to fit the model
+
+# Create the data frame for the joint modeling
+n <- nrow(bronch1) 
+Y <- matrix(NA, 2*n, 2)
+Y[1:n, 1] <- bronch1$cbr
+Y[n+(1:n), 2] <- -1* bronch1$dust
+beta.0 <- c(rep(1, n), rep(NA, n))
+beta.x <- c(1:n, rep(NA, n))
+idx.x <- c(rep(NA, n), 1:n)
+weight.x <- c(rep(NA, n), -rep(1, n))
+beta.smoking <- c(bronch1$smoking, rep(NA, n))
+beta.expo <- c(bronch1$expo, rep(NA, n))
+Ntrials <- c(rep(1, n), rep(NA, n))
+
+bronch.jointdata <- data.frame(Y=Y, 
+                         beta.0=beta.0, beta.x=beta.x, beta.smoking=beta.smoking, beta.expo=beta.expo, 
+                         idx.x=idx.x, weight.x=weight.x, Ntrials = Ntrials)
+
+bronch.formula2 <- Y ~  beta.0 - 1 + beta.smoking + beta.expo + f(beta.x, copy = "idx.x", hyper = list(beta = list(param = prior.beta, fixed = FALSE))) + f(idx.x, weight.x, model = "iid", values = 1:n, hyper = list(prec = list(initial = -15, fixed = TRUE))) 
+
+bronch.mec.inla2 <- inla(bronch.formula2, Ntrials = Ntrials, data = bronch.jointdata, family = c("binomial", "gaussian"),
+        control.family = list(
+          list(hyper = list()),
+          list(hyper = list(
+            prec = list(initial=log(prec.u),
+                        param = prior.prec.u,
+                        fixed = FALSE)))),
+control.fixed = list(mean.intercept = prior.beta[1], prec.intercept = prior.beta[2], mean = prior.beta[1], prec = prior.beta[2]))
+bronch.mec.inla2 <- inla.hyperpar(bronch.mec.inla2)
+summary(bronch.mec.inla2)

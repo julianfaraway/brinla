@@ -159,6 +159,5 @@ lines(x.den1$x, x.den1$y.upper, lty = 2, lwd = 3)
 lines(x.den1$x, x.den1$y.lower, lty = 2, lwd = 3)
 lines(x.den2, col = "blue", lty = 4, lwd = 3)
 
-# Quantile Regression Models
 
 sessionInfo()
