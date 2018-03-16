@@ -1,6 +1,6 @@
 # Bayesian Regression with INLA
 
-A forthcoming book by [Xiaofeng Wang](https://filer.case.edu/xxw17/), [Ryan Yue](http://zicklin.baruch.cuny.edu/faculty/profiles/yu-ryan-yue) and [Julian Faraway](http://people.bath.ac.uk/jjf23/)
+A book by [Xiaofeng Wang](https://filer.case.edu/xxw17/), [Ryan Yue](http://zicklin.baruch.cuny.edu/faculty/profiles/yu-ryan-yue) and [Julian Faraway](http://people.bath.ac.uk/jjf23/)
 
 ## Chapter scripts
 
