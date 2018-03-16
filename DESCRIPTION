@@ -6,7 +6,7 @@ Author: Julian Faraway <julian.faraway@gmail.com>,
   Ryan Yue <yu.yue@baruch.cuny.edu>, 
   Xiaofeng Wang <xfwang@gmail.com>
 Maintainer: Julian Faraway <julian.faraway@gmail.com>
-Description: Data and code to support a forthcoming book regarding Bayesian
+Description: Data and code to support a book regarding Bayesian
     regression models using INLA
 License: GPL-2
 LazyData: TRUE
