@@ -1,9 +1,15 @@
-
 This R package contains data and R code from the [book](http://julianfaraway.github.io/brinla/) entitled "Bayesian Regression with INLA". 
 
-You can install it (provided you have loaded the `devtools` package) with:
+To install it: 
+
+1. Install INLA from <http://www.r-inla.org/download> (if you have not already done so)
+
+2. Install the `devtools` R package. (if you have not already done so)
+
+3. Install `brinla`
 
 ```
+library(devtools)
 install_github("julianfaraway/brinla")
 ```
 
