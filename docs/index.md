@@ -22,6 +22,11 @@ A book by [Xiaofeng Wang](https://filer.case.edu/xxw17/), [Ryan Yue](http://zick
 The [brinla](https://github.com/julianfaraway/brinla) R package contains data and functions
 to support the book.
 
+## Errata
+
+Here are the [errata](errata.md). If you find any other errata, please let us know according to the chapter: Ch3, 4, 6, 10 (Xiaofeng Wang),
+Ch2, 7 or 9 (Ryan Yue) or Ch1, 5 or 8 (Julian Faraway).
+
 ## Examples
 
 Here are some [preview examples](http://people.bath.ac.uk/jjf23/brinla/)

@@ -78,7 +78,7 @@ psamp <- inla.posterior.sample(n=1000, pmod)
 psamp[[1]]
 lvsamp <- t(sapply(psamp, function(x) x$latent))
 colnames(lvsamp) <- row.names(psamp[[1]]$latent)
-mean(lvsamp[,'site:C'] > lvsamp[,'site:A'])
+mean(lvsamp[,'site:3'] > lvsamp[,'site:1'])
 
 # Longitudinal Data
 
