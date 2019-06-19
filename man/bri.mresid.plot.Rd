@@ -4,9 +4,9 @@
 \alias{bri.mresid.plot}
 \title{Martingale Residual plot}
 \usage{
-bri.mresid.plot(resid.obj, covariate = NULL, smooth = FALSE, xlab = NULL,
-  ylab = "Martingale residual", main = "", cex.lab = 1.25,
-  cex.axis = 1.25, ...)
+bri.mresid.plot(resid.obj, covariate = NULL, smooth = FALSE,
+  xlab = NULL, ylab = "Martingale residual", main = "",
+  cex.lab = 1.25, cex.axis = 1.25, ...)
 }
 \arguments{
 \item{resid.obj}{object from bri.surv.resid function}

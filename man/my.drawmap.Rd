@@ -4,11 +4,11 @@
 \alias{my.drawmap}
 \title{Draw map (internal function)}
 \usage{
-my.drawmap(data, map, regionvar = 2, plotvar = 3, limits, cols = "grey",
-  nrcolors = 100, swapcolors = TRUE, pcat = FALSE, hcl.par = list(h =
-  c(130, 25), c = 100, l = c(90, 70)), hsv.par = list(s = 1, v = 1),
-  legend = TRUE, drawnames = FALSE, cex.names = 0.7, cex.legend = 1.5,
-  mar.min = 2, ...)
+my.drawmap(data, map, regionvar = 2, plotvar = 3, limits,
+  cols = "grey", nrcolors = 100, swapcolors = TRUE, pcat = FALSE,
+  hcl.par = list(h = c(130, 25), c = 100, l = c(90, 70)),
+  hsv.par = list(s = 1, v = 1), legend = TRUE, drawnames = FALSE,
+  cex.names = 0.7, cex.legend = 1.5, mar.min = 2, ...)
 }
 \description{
 Draw map (internal function)

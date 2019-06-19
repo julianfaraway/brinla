@@ -4,8 +4,8 @@
 \alias{bri.basehaz.plot}
 \title{Plot the baseline hazard functions for survival models using INLA}
 \usage{
-bri.basehaz.plot(inla.obj, plot = TRUE, cex.lab = 1.25, cex.axis = 1.25,
-  ...)
+bri.basehaz.plot(inla.obj, plot = TRUE, cex.lab = 1.25,
+  cex.axis = 1.25, ...)
 }
 \arguments{
 \item{inla.obj}{an object of class "inla".}

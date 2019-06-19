@@ -4,8 +4,8 @@
 \alias{excursions.brinla}
 \title{Excursion sets and contour credible regions for latent Gaussian models}
 \usage{
-excursions.brinla(result.inla, name = NULL, ind = NULL, method, u, type,
-  alpha = 0.05)
+excursions.brinla(result.inla, name = NULL, ind = NULL, method, u,
+  type, alpha = 0.05)
 }
 \arguments{
 \item{result.inla}{result object from INLA call}

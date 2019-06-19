@@ -4,9 +4,9 @@
 \alias{bri.band.ggplot}
 \title{Plot credible band for a nonlinear function using ggplot()}
 \usage{
-bri.band.ggplot(result, name = NULL, x = NULL, alpha = 0.05, ind = NULL,
-  type = c("random", "fitted", "linear", "lincomb"), xlab = NULL,
-  ylab = NULL, main = NULL, hpd = FALSE)
+bri.band.ggplot(result, name = NULL, x = NULL, alpha = 0.05,
+  ind = NULL, type = c("random", "fitted", "linear", "lincomb"),
+  xlab = NULL, ylab = NULL, main = NULL, hpd = FALSE)
 }
 \arguments{
 \item{result}{the result object from INLA call}

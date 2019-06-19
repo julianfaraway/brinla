@@ -6,8 +6,8 @@
 \usage{
 bri.beta.resid(inla.obj, covariate = NULL, m = 1000, pmedian = FALSE,
   plot = FALSE, smooth = FALSE, xlab = NULL, cex.lab = 1.25,
-  cex.axis = 1.25, ylab = "Bayesian residual", ylim = NULL, main = "",
-  ...)
+  cex.axis = 1.25, ylab = "Bayesian residual", ylim = NULL,
+  main = "", ...)
 }
 \arguments{
 \item{inla.obj}{an object of class "inla".}

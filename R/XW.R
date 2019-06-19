@@ -496,7 +496,37 @@ bri.density <- function(x, m = 101, from, to, cut = 0.1, diagonal = 1e-03, const
 }
 
 
+#' Bayesian Regression with Noninformative Priors
+#'
+#' @param lmfit lm output
+#' @param B samples
+#'
+#' @return posteriors and summary
+#' @export
+#'
 
+BayesLM.nprior <- function(lmfit, B){
+  QR <- lmfit$qr
+  df.res <- lmfit$df.residual
+  V <- qr.R(QR) 
+  coef <- lmfit$coef
+  Vb<- chol2inv(V) 
+  s2 <- (t(lmfit$residuals)%*%lmfit$residuals)
+  s2<- s2[1,1]/df.res 
+  sigma2 <- df.res * s2/rchisq(B,df.res)
+  coef.post <- data.frame(t(sapply(sigma2,function(x) mvrnorm(1,coef,Vb*x))))
+  post.dist <- data.frame(coef.post, sigma = sqrt(sigma2))
+  names(post.dist) <- c(names(lmfit$coef), "sigma")
+  summary.post <- t(apply(post.dist, 2, function(x)
+  {
+    c("mean"=mean(x),
+      "se"=sd(x),
+      "0.025quant" = unname(quantile(x,prob=0.025)),
+      "median"=median(x),
+      "0.975quant" = unname(quantile(x,prob=0.975)))
+  }))
+  return(list(post.dist=post.dist, summary.stat = summary.post))          
+}
 
 
 

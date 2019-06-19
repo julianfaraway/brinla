@@ -4,8 +4,8 @@
 \alias{bri.gpr}
 \title{Gaussian Process Regression in 1D}
 \usage{
-bri.gpr(x, y, pcprior, nbasis = 25, degree = 2, alpha = 2, xout = x,
-  sigma0 = sd(y), rho0 = 0.25 * (max(x) - min(x)))
+bri.gpr(x, y, pcprior, nbasis = 25, degree = 2, alpha = 2,
+  xout = x, sigma0 = sd(y), rho0 = 0.25 * (max(x) - min(x)))
 }
 \arguments{
 \item{x}{the predictor vector}

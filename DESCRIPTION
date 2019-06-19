@@ -20,7 +20,7 @@ Suggests:
     knitr,
     rmarkdown,
     excursions
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 URL: http://github.com/julianfaraway/brinla
 BugReports: http://github.com/julianfaraway/brinla/issues
 VignetteBuilder: knitr

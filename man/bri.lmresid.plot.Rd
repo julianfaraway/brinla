@@ -4,9 +4,9 @@
 \alias{bri.lmresid.plot}
 \title{linear regression model Baysian residual plot}
 \usage{
-bri.lmresid.plot(inla.obj, covariate = NULL, m = 1000, pmedian = FALSE,
-  smooth = FALSE, xlab = NULL, cex.lab = 1.25, cex.axis = 1.25,
-  ylab = "Bayesian residual", main = "", ...)
+bri.lmresid.plot(inla.obj, covariate = NULL, m = 1000,
+  pmedian = FALSE, smooth = FALSE, xlab = NULL, cex.lab = 1.25,
+  cex.axis = 1.25, ylab = "Bayesian residual", main = "", ...)
 }
 \arguments{
 \item{inla.obj}{an object of class "inla".}

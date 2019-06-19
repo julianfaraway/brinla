@@ -5,8 +5,8 @@
 \title{Cox-Snell residual plot}
 \usage{
 bri.csresid.plot(resid.obj, lwd = 2, xlab = "Cox-Snell Residual",
-  ylab = "Estimated Cumulative Hazard Rates", main = "", cex.lab = 1.25,
-  cex.axis = 1.25, ...)
+  ylab = "Estimated Cumulative Hazard Rates", main = "",
+  cex.lab = 1.25, cex.axis = 1.25, ...)
 }
 \arguments{
 \item{resid.obj}{object from bri.surv.resid function}

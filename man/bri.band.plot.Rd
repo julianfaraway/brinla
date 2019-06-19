@@ -4,10 +4,11 @@
 \alias{bri.band.plot}
 \title{Plot credible band for a nonlinear function using plot()}
 \usage{
-bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL, x = NULL,
-  xlab = NULL, ylab = NULL, main = NULL, sub = NULL, xlim = NULL,
-  ylim = NULL, cex.lab = 1.5, cex.axis = 1.5, type = c("random",
-  "fitted", "linear"), hpd = FALSE, gray.band = TRUE)
+bri.band.plot(result, name = NULL, alpha = 0.05, ind = NULL,
+  x = NULL, xlab = NULL, ylab = NULL, main = NULL, sub = NULL,
+  xlim = NULL, ylim = NULL, cex.lab = 1.5, cex.axis = 1.5,
+  type = c("random", "fitted", "linear"), hpd = FALSE,
+  gray.band = TRUE)
 }
 \arguments{
 \item{result}{the result object from INLA call}

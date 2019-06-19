@@ -4,9 +4,9 @@
 \alias{bri.dresid.plot}
 \title{Deviance residual plot}
 \usage{
-bri.dresid.plot(resid.obj, covariate = NULL, smooth = FALSE, xlab = NULL,
-  ylab = "Deviance residual", main = "", cex.lab = 1.25,
-  cex.axis = 1.25, ...)
+bri.dresid.plot(resid.obj, covariate = NULL, smooth = FALSE,
+  xlab = NULL, ylab = "Deviance residual", main = "",
+  cex.lab = 1.25, cex.axis = 1.25, ...)
 }
 \arguments{
 \item{resid.obj}{object from bri.surv.resid function}
