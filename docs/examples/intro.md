@@ -38,7 +38,7 @@ data:
 plot(y ~ x, xlab="Distance(Mpc)", ylab="Velocity(km/s)", data=hubble)
 ```
 
-![](figs/unnamed-chunk-2-1.png)<!-- -->
+![](figs/hub1-1.png)<!-- -->
 
 The velocity *y* is related to the distance *x* by \[
 y = \beta x
@@ -177,7 +177,7 @@ plot(imod$marginals.fixed$x, type = "l", xlab = "beta", ylab = "density",
 abline(v = ibci[c(3, 5)], lty = 2)
 ```
 
-![](figs/unnamed-chunk-11-1.png)<!-- -->
+![](figs/hubpost-1.png)<!-- -->
 
 We can convert to statements about the age of the universe in terms of
 billions of years:
@@ -199,6 +199,6 @@ plot(ageden, type = "l", xlab = "Age in billions of years", ylab = "density")
 abline(v = hubtoage(ibci[c(3, 5)]), lty = 2)
 ```
 
-![](figs/unnamed-chunk-13-1.png)<!-- -->
+![](figs/hubci-1.png)<!-- -->
 
 The 95% credible interval is \[11.51, 14.37\] billion years.

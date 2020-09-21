@@ -25,7 +25,7 @@ The data for the example comes from the Hubble space telescope. It can also be f
 [background info](http://www.space.com/25179-hubble-constant.html)
 Load and plot the data:
 
-```{r}
+```{r hub1}
 plot(y ~ x, xlab="Distance(Mpc)", ylab="Velocity(km/s)", data=hubble)
 ```
 
@@ -114,7 +114,7 @@ Quite apart from the numerical differences, the two intervals are conceptually d
 
 We can make a plot of the posterior density of beta (with the 95% credible interval added)
 
-```{r}
+```{r hubpost}
 x <- seq(60, 100, length.out = 100)
 plot(imod$marginals.fixed$x, type = "l", xlab = "beta", ylab = "density", 
     xlim = c(60, 100))
@@ -129,7 +129,7 @@ hubtoage(ibci[c(1,3,4,5,6)])
 
 This can also be plotted:
 
-```{r}
+```{r hubci}
 ageden <- inla.tmarginal(hubtoage, imod$marginals.fixed$x)
 plot(ageden, type = "l", xlab = "Age in billions of years", ylab = "density")
 abline(v = hubtoage(ibci[c(3, 5)]), lty = 2)
