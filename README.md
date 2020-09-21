@@ -9,7 +9,6 @@ To install it:
 3. Install `brinla`
 
 ```
-library(devtools)
-install_github("julianfaraway/brinla")
+devtools::install_github("julianfaraway/brinla")
 ```
 
