@@ -1,31 +1,31 @@
 ---
 title: Gaussian process regression using INLA
-author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
-bibliography: ../INLA_book_latex/merged.bib
-date: "`r Sys.Date()`"
-output:
- html_document:
-  toc: true
+bibliography: merged.bib
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: github_document
 ---
 
 ```{r global_options, include=FALSE}
 library(knitr)
-knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
 options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
 knitr::knit_hooks$set(setPch = function(before, options, envir) {
   if(before) par(pch = 20)
 })
 opts_chunk$set(setPch = TRUE)
 ```
 
-See the [introduction](index.html) for more about INLA. This [tutorial paper](http://www.math.ntnu.no/inla/r-inla.org/papers/jss/lindgren.pdf) is directed towards
+See the [introduction](index.md) for more about INLA. This [tutorial paper](http://www.math.ntnu.no/inla/r-inla.org/papers/jss/lindgren.pdf) is directed towards
 spatial problems but same methods can be profitably applied on one-dimensional smoothing
 problems. See also [@lind:rue:jss:15] for details. The construction is detailed in 
 our book.
 
 Load the packages (you may need to [install the brinla package](https://github.com/julianfaraway/brinla)):
 
-```{r}
+```{r gpreg-1}
 library(ggplot2)
 library(INLA)
 library(brinla)
@@ -36,14 +36,14 @@ library(brinla)
 We use the fossil example from [@bral:gsa:97] and used by [@chaud:jasa:99]. 
 We have the ratio of strontium isotopes found in fossil shells in the mid-Cretaceous period from about 90 to 125 million years ago. We rescale the response as in the SiZer paper.
 
-```{r}
+```{r gpreg-2}
 data(fossil, package="brinla")
 fossil$sr <- (fossil$sr-0.7)*100
 ```
 
 Plot the data:
 
-```{r}
+```{r gpreg-3}
 plot(sr ~ age, fossil, xlab="Age",ylab="Strontium Ratio")
 ```
 
@@ -52,7 +52,7 @@ plot(sr ~ age, fossil, xlab="Age",ylab="Strontium Ratio")
 The default fit uses priors based on the SD of the response and the range of the predictor
 to motivate sensible priors.
 
-```{r}
+```{r gpreg-4}
 gpmod = bri.gpr(fossil$age, fossil$sr)
 ```
 
@@ -69,11 +69,11 @@ lines(gpmod$xout, gpmod$ucb, lty=2)
 
 The default number of spline basis functions is 25. Let's see what happens if you increase this to 100:
 
-```{r}
+```{r gpreg-5}
 gpmod = bri.gpr(fossil$age, fossil$sr, nbasis = 100)
 ```
 
-```{r ref.label='plotfit'}
+```{r gpreg-6, ref.label='plotfit'}
 ```
 
 It makes very little difference although it does take longer to compute. This demonstrates that you just need
@@ -83,11 +83,11 @@ enough splines for the flexibility you want. If you use more, you won't get a ro
 
 We can decrease the degree of the splines (default is 2 corresponding to cubic splines):
 
-```{r}
+```{r gpreg-7}
 gpmod = bri.gpr(fossil$age, fossil$sr, degree=0)
 ```
 
-```{r ref.label='plotfit'}
+```{r gpreg-8, ref.label='plotfit'}
 ```
 
 We get a piecewise constant fit (the diagonal parts are just from interpolating the fit - could use a better grid to avoid this)
@@ -96,12 +96,12 @@ We get a piecewise constant fit (the diagonal parts are just from interpolating 
 
 We can change the shape of the GP kernel where default is alpha = 2
 
-```{r}
+```{r gpreg-9}
 gpmod = bri.gpr(fossil$age, fossil$sr, alpha = 1)
 ```
 
 
-```{r ref.label='plotfit'}
+```{r gpreg-10, ref.label='plotfit'}
 ```
 
 The kernel is less smooth resulting in a rougher fit.
@@ -110,12 +110,12 @@ The kernel is less smooth resulting in a rougher fit.
 
 We can set the prior mean on the error to be much larger than the default (which is the SD of the response - already quite large:
 
-```{r}
+```{r gpreg-11}
 gpmod = bri.gpr(fossil$age, fossil$sr, sigma0 = 10*sd(fossil$sr))
 ```
 
 
-```{r ref.label='plotfit'}
+```{r gpreg-12, ref.label='plotfit'}
 ```
 
 Doesn't have much affect on the outcome. Nice to have a robust choice of prior.
@@ -123,12 +123,12 @@ Doesn't have much affect on the outcome. Nice to have a robust choice of prior.
 
 We can set the prior mean on the error to be much smaller than the default (which is the SD of the response)
 
-```{r}
+```{r gpreg-13}
 gpmod = bri.gpr(fossil$age, fossil$sr, sigma0 = 0.1*sd(fossil$sr))
 ```
 
 
-```{r ref.label='plotfit'}
+```{r gpreg-14, ref.label='plotfit'}
 ```
 
 Again quite robust to this choice.
@@ -136,11 +136,11 @@ Again quite robust to this choice.
 We can also experiment with the range. The default is one quarter of the range of the predictor. Let's make it equal
 to the range:
 
-```{r}
+```{r gpreg-15}
 gpmod = bri.gpr(fossil$age, fossil$sr, rho0 = max(fossil$age) - min(fossil$age))
 ```
 
-```{r ref.label='plotfit'}
+```{r gpreg-16, ref.label='plotfit'}
 ```
 
 Again makes very little difference.
@@ -150,18 +150,18 @@ Again makes very little difference.
 We can also use penalized complexity priors. We set a high value for sigma where we judge only a 5% chance it is more than this
 and a high value for the range where we judge only a 5% chance that it is less than this.
 
-```{r}
+```{r gpreg-17}
 highsig = 10*sd(fossil$sr)
 lowrho = 0.05*(max(fossil$age) - min(fossil$age))
 gpmod = bri.gpr(fossil$age, fossil$sr, pcprior = c(highsig, lowrho))
 ```
 
-```{r ref.label='plotfit'}
+```{r gpreg-18, ref.label='plotfit'}
 ```
 
 # Package versions
 
-```{r}
+```{r gpreg-19}
 sessionInfo()
 ```
 

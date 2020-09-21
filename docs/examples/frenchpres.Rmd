@@ -1,19 +1,26 @@
 ---
 title: "Regression with bounded coefficients"
-author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-output: html_document
+output: github_document
 ---
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+library(knitr)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
 options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
+knitr::knit_hooks$set(setPch = function(before, options, envir) {
+  if(before) par(pch = 20)
+})
+opts_chunk$set(setPch = TRUE)
 ```
 
-See the [introduction](index.html) for an overview.
+See the [introduction](index.md) for an overview.
 Load the libraries:
 
-```{r}
+```{r frenchpres-1}
 library(INLA)
 library(faraway)
 ```
@@ -24,7 +31,7 @@ Data come from the `faraway` package. The help page reads:
 
 Elections for the French presidency proceed in two rounds. In 1981, there were 10 candidates in the first round. The top two candidates then went on to the second round, which was won by Francois Mitterand over Valery Giscard-d'Estaing. The losers in the first round can gain political favors by urging their supporters to vote for one of the two finalists. Since voting is private, we cannot know how these votes were transferred, we might hope to infer from the published vote totals how this might have happened. Data is given for vote totals in every fourth department of France:
 
-```{r}
+```{r frenchpres-2}
 data(fpe,package="faraway")
 head(fpe)
 ```
@@ -32,7 +39,7 @@ head(fpe)
 Proportion voting for Mitterand in second round is made up from some proportion of first round
 votes:
 
-```{r}
+```{r frenchpres-3}
 lmod <- lm(A2 ~ A+B+C+D+E+F+G+H+J+K+N-1, fpe)
 coef(lmod)
 ```
@@ -41,7 +48,7 @@ But all these coefficients should lie in the range [0,1]. Note we have ignored t
 
 Can recursively set coefficients to the boundary to find a valid solution but this is not optimal. Instead, can solve the least squares problem with inequality constraints:
 
-```{r}
+```{r frenchpres-4}
 library(mgcv)
 M <- list(w=rep(1,24),X=model.matrix(lmod), y=fpe$A2, Ain=rbind(diag(11),-diag(11)), C=matrix(0,0,0), array(0,0), S=list(), off=NULL, p=rep(0.5,11), bin=c(rep(0,11), rep(-1,11)))
 a <- pcls(M)
@@ -56,7 +63,7 @@ But this gives no uncertainties on the estimates.
 The `clinear` latent model in INLA allows us to constrain the values of the parameter within a specified range - in this case [0,1].
 The default version of this model is:
 
-```{r}
+```{r frenchpres-5}
 cmod <- inla(A2 ~ -1 + 
                f(A, model = "clinear", range = c(0, 1)) + 
                f(B, model = "clinear", range = c(0, 1)) + 
@@ -86,7 +93,7 @@ to zero and one.
 The `logitbeta` prior conveniently allows us to express the prior on the slope parameter as a beta distribution. If we choose the
 hyperparameters of beta(a,b) with both a and b small, values close to zero or one will be preferred. Here is the density of beta(0.5,0.5)
 
-```{r}
+```{r frenchpres-6}
 x = seq(0,1,length.out = 100)
 plot(x,dbeta(x,0.5,0.5),type="l")
 ```
@@ -94,7 +101,7 @@ plot(x,dbeta(x,0.5,0.5),type="l")
 This seems reasonable since we expect supporters of minor parties to throw support almost exclusively to one of the two final round 
 candidates.
 
-```{r}
+```{r frenchpres-7}
 bprior = list(theta = list(prior = "logitbeta", param=c(0.5,0.5)))
 cmod <- inla(A2 ~ -1 + 
                f(A, model = "clinear", range = c(0, 1), hyper = bprior) + 
@@ -114,13 +121,13 @@ cmod$summary.hyperpar$mode
 
 We can plot the posteriors for each of the candidates in the first round:
 
-```{r}
+```{r frenchpres-8}
 plot(cmod$marginals.hyperpar$`Beta for B`,type="l", xlab = "p", ylab="density",main="Transfer proportion for candidate B")
 ```
 
 We see that almost all candidate B (Giscard) first round voters did *not* vote for Mitterand in the second round. In contrast,
 
-```{r}
+```{r frenchpres-9}
 plot(cmod$marginals.hyperpar$`Beta for E`,type="l", xlab = "p", ylab="density",main="Transfer proportion for candidate E")
 ```
 

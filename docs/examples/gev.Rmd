@@ -1,27 +1,27 @@
 ---
 title: Extreme values using INLA
-author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
-bibliography: ../INLA_book_latex/merged.bib
-date: "`r Sys.Date()`"
-output:
- html_document:
-  toc: true
+bibliography: merged.bib
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: github_document
 ---
 
 ```{r global_options, include=FALSE}
 library(knitr)
-knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
 options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
 knitr::knit_hooks$set(setPch = function(before, options, envir) {
   if(before) par(pch = 20)
 })
 opts_chunk$set(setPch = TRUE)
 ```
 
-See the [introduction](index.html) for more about INLA. Load in the packages:
+See the [introduction](index.md) for more about INLA. Load in the packages:
 
 
-```{r}
+```{r gev-1}
 library(INLA)
 library(brinla)
 ```
@@ -32,14 +32,14 @@ Extreme flows in rivers are of special interest since flood defences must be des
 National River Flow Archive provides data about river flows in the United Kingdom. For this example, we consider
 data on annual maximum flow rates from the River Calder in Cumbria, England from 1973 to 2014:
 
-```{r}
+```{r gev-2}
 data(calder, package = "brinla")
 plot(Flow ~ WaterYear, calder)
 ```
 
 Rescale year for convenience:
 
-```{r}
+```{r gev-3}
 calder$year = calder$WaterYear-1973
 ```
 
@@ -50,7 +50,7 @@ notoriously difficult to fit. It is not unusual to see failures to fit which req
 to rectify. The current implementation is marked as experimental so you may experience
 some difficulties with the fit. We will need the `control.compute = list(config=TRUE)` in the computations later in this example.
 
-```{r}
+```{r gev-4}
 imod <- inla(Flow ~ 1 + year, data = calder, family = "gev", scale = 0.1, control.compute = list(config=TRUE))
 imod$summary.fixed
 ```
@@ -58,14 +58,14 @@ imod$summary.fixed
 We can see that there is positive linear trend term indicating the peak flows for this
 river are increasing over time. We can plot the fixed effect posterior for the year:
 
-```{r}
+```{r gev-5}
 plot(imod$marginals.fixed$year, type="l")
 ```
 
 We can see that the posterior for the trend in year is concentrated above zero indicating evidence
 of an increasing trend. Probability that slope is negative is:
 
-```{r}
+```{r gev-6}
 inla.pmarginal(0, imod$marginals.fixed$year)
 ```
 
@@ -73,20 +73,20 @@ Rather small.
 
 Plot the posterior for the precision:
 
-```{r}
+```{r gev-7}
 plot(imod$marginals.hyperpar$`precision for GEV observations`,type="l",xlim=c(0,0.1))
 ```
 
 or plot that on an SD scale:
 
-```{r}
+```{r gev-8}
 plot(bri.hyper.sd(imod$marginals.hyperpar$`precision for GEV observations`),type="l")
 ```
 
-Plot the posterior for the shape parameter:
+Plot the posterior for the tail parameter:
 
-```{r}
-plot(imod$marginals.hyperpar$`shape-parameter for gev observations`,type="l",xlim=c(-0.2,0.5))
+```{r gev-9}
+plot(imod$marginals.hyperpar$`tail parameter for GEV observations`,type="l",xlim=c(-0.2,0.5))
 ```
 
 A small chance that this is negative.
@@ -97,7 +97,7 @@ The maximum flow over the period observation occured in the 1997 water year meas
 model, what was the probability of observing such a flow (or greater)? This will give us a measure of how unusual this
 event was. First we need an `R` function to compute P(Y < y) for the generalized extreme value distribution:
 
-```{r}
+```{r gev-10}
 pgev = function(y,xi,tau,eta,sigma=1){
   exp(-(1+xi*sqrt(tau*sigma)*(y-eta))^(-1/xi))
 }
@@ -105,7 +105,7 @@ pgev = function(y,xi,tau,eta,sigma=1){
 
 Compute probability of observed flow less than this maximum flow in 1997:
 
-```{r}
+```{r gev-11}
 yr = 1997-1973
 maxflow = 173.17
 eta = sum(c(1,yr)*imod$summary.fixed$mean)
@@ -117,20 +117,20 @@ sigma = 0.1
 
 So probability of exceeding the observed value is:
 
-```{r}
+```{r gev-12}
 1-pless
 ```
 
 Hydrologists often work with the expected
 time for the event to occur called the *recurrence interval*. In this case, the value is:
 
-```{r}
+```{r gev-13}
 1/(1-pless)
 ```
 
 Now set year to 2017:
 
-```{r}
+```{r gev-14}
 yr = 2017-1973
 maxflow = 173.17
 eta = sum(c(1,yr)*imod$summary.fixed$mean)
@@ -148,7 +148,7 @@ We see that the recurrence interval substantially reduced.
 Can compute a 95% credibility interval. Need to sample from the full posterior. This is
 where we need the `control.compute = list(config=TRUE)` option.
 
-```{r}
+```{r gev-15}
 nsamp = 999
 postsamp = inla.posterior.sample(nsamp, imod)
 pps = t(sapply(postsamp, function(x) c(x$hyperpar, x$latent[42:43])))
@@ -157,20 +157,20 @@ colnames(pps) <- c("precision","shape","beta0","beta1")
 
 Plot the sampled hyperparameters:
 
-```{r}
+```{r gev-16}
 plot(pps[,1],pps[,2]*0.01,xlab="Precision",ylab="Shape")
 ```
 
 We see that the sampled hyperparameters are concentrated on a sparse grid. Here is the sampled posterior
 for the linear model parameters:
 
-```{r}
+```{r gev-17}
 plot(pps[,3],pps[,4])
 ```
 
 No problem with this. We compute the recurrency interval for each sample.
 
-```{r}
+```{r gev-18}
 sigma = 0.1
 maxflow = 173
 retp = numeric(nsamp)
@@ -185,7 +185,7 @@ for(i in 1:nsamp){
 
 From this we can compute the credibility interval:
 
-```{r}
+```{r gev-19}
 quantile(retp, c(0.025, 0.5, 0.975))
 ```
 
@@ -195,7 +195,7 @@ as it seems because these are the integration points.
 
 # Package versions
 
-```{r}
+```{r gev-20}
 sessionInfo()
 ```
 

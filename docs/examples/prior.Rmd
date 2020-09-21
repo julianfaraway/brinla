@@ -1,23 +1,28 @@
 ---
 title: "Define your own prior with INLA"
-author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-output:
- html_document:
-  toc: true
+output: github_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
 options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
+knitr::knit_hooks$set(setPch = function(before, options, envir) {
+  if(before) par(pch = 20)
+})
+opts_chunk$set(setPch = TRUE)
 ```
 
 ## Initialization
 
-See the [introduction](index.html) for an overview.
+See the [introduction](index.md) for an overview.
 Load the libraries:
 
-```{r}
+```{r prior-1}
 library(INLA)
 library(brinla)
 library(ggplot2)
@@ -25,7 +30,7 @@ library(ggplot2)
 
 We illustrate the method using the following data:
 
-```{r}
+```{r prior-2}
 data(reeds, package="brinla")
 ggplot(reeds,aes(site,nitrogen))+geom_point()
 ```
@@ -45,7 +50,7 @@ priors we shall specify.
 By default, INLA places a gamma prior on the precisions (inverse of the variance). We
 fit this model and examine the posteriors in terms of the SDs (which are easier to understand than precisions)
 
-```{r}
+```{r prior-3}
 formula <- nitrogen ~ 1 + f(site, model="iid")
 imod <- inla(formula,family="gaussian", data = reeds)
 bri.hyperpar.summary(imod)
@@ -53,7 +58,7 @@ bri.hyperpar.summary(imod)
 
 We can also plot the posteriors of these two SDs.
 
-```{r}
+```{r prior-4}
 bri.hyperpar.plot(imod)
 ```
 
@@ -65,7 +70,7 @@ is an example using the [penalized complexity prior](https://arxiv.org/abs/1403.
 help us set the scale of this prior (although it is better if you set this with knowledge
 of the problem behind the data)
 
-```{r}
+```{r prior-5}
 sdres <- sd(reeds$nitrogen)
 pcprior <- list(prec = list(prior="pc.prec", param = c(3*sdres,0.01)))
 formula <- nitrogen ~ f(site, model="iid", hyper = pcprior)
@@ -75,7 +80,7 @@ bri.hyperpar.summary(pmod)
 
 Plot the posterior densities.
 
-```{r}
+```{r prior-6}
 bri.hyperpar.plot(pmod)
 ```
 
@@ -91,7 +96,7 @@ $$
 
 We calculate scaling equivalent to the PC prior scaling for future use:
 
-```{r}
+```{r prior-7}
 (lambda = 3*sdres/tan(pi*0.99/2))
 ```
 
@@ -104,7 +109,7 @@ $$
 We then define the prior as:
 
 
-```{r}
+```{r prior-8}
 halfcauchy = "expression:
               lambda = 0.022;
               precision = exp(log_precision);
@@ -116,7 +121,7 @@ halfcauchy = "expression:
 
 And use this prior with
 
-```{r}
+```{r prior-9}
 hcprior = list(prec = list(prior = halfcauchy))
 formula <- nitrogen ~ f(site, model="iid", hyper = hcprior)
 hmod <- inla(formula, family="gaussian", data=reeds)
@@ -125,7 +130,7 @@ bri.hyperpar.summary(hmod)
 
 Plot the posterior distributions:
 
-```{r}
+```{r prior-10}
 bri.hyperpar.plot(hmod)
 ```
 

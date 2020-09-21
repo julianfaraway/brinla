@@ -1,21 +1,23 @@
 ---
 title: INLA for ridge regression
-author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
-date: "`r Sys.Date()`"
-output:
- html_document:
-  toc: true
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: github_document
 ---
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+library(knitr)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
 options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
 ```
 
-See the [introduction](index.html) for an overview.
+
+See the [introduction](index.md) for an overview.
 Load the packages:
 
-```{r}
+```{r ridge-1}
 library(INLA)
 library(faraway)
 library(brinla)
@@ -43,7 +45,7 @@ Dataset contains the following variables
 We split the data into a training set with the first 172 observations and the
 remainder going into a test set:
 
-```{r}
+```{r ridge-2}
 data(meatspec, package="faraway")
 trainmeat <- meatspec[1:172,]
 testmeat <- meatspec[173:215,]
@@ -53,7 +55,7 @@ wavelengths <- seq(850, 1050, length=100)
 
 How well does linear regression predict the training set?:
 
-```{r}
+```{r ridge-3}
 modlm <- lm(fat ~ ., trainmeat)
 summary(modlm)$r.squared
 rmse <- function(x,y) sqrt(mean((x-y)^2))
@@ -62,7 +64,7 @@ rmse(fitted(modlm), trainmeat$fat)
 
 But the fit to the test set:
 
-```{r}
+```{r ridge-4}
 rmse(predict(modlm,testmeat), testmeat$fat)
 ```
 
@@ -71,7 +73,7 @@ is much worse indicating overfitting on the training set.
 
 We can plot the coefficients.
 
-```{r}
+```{r ridge-5}
 plot(wavelengths,coef(modlm)[-1], type="l",ylab="LM beta Coefficients")
 ```
 
@@ -84,7 +86,7 @@ continuously with the wavelength.
 Use ridge regression from the `MASS` library. We use GCV to select lambda which controls 
 the shrinkage:
 
-```{r}
+```{r ridge-6}
 require(MASS)
 rgmod <- lm.ridge(fat ~ ., trainmeat, lambda = seq(0, 5e-8, len=21))
 which.min(rgmod$GCV)
@@ -94,7 +96,7 @@ abline(v=1.75e-08)
 
 Check the predictive performance:
 
-```{r}
+```{r ridge-7}
 ypred <- cbind(1,as.matrix(trainmeat[,-101])) %*% coef(rgmod)[8,]
 rmse(ypred, trainmeat$fat)
 ypred <- cbind(1,as.matrix(testmeat[,-101])) %*% coef(rgmod)[8,]
@@ -106,7 +108,7 @@ The test set performance is also worse which is a disappointment (we would expec
 
 We can plot the coefficients:
 
-```{r}
+```{r ridge-8}
 plot(wavelengths,coef(rgmod)[8,-1],type="l",ylab="Ridge Coefficients")
 ```
 
@@ -122,7 +124,7 @@ INLA does not like `fat ~ .` as a formula. It expects us to spell out the predic
 take this from the previous linear model. Also we want to make predictions for
 the test set so we create a data frame where all the test responses are missing.
 
-```{r}
+```{r ridge-9}
 metab <- meatspec
 testfat <- metab$fat[173:215]
 metab$fat[173:215] <- NA
@@ -131,14 +133,14 @@ blrmod <- inla(formula(modlm), family="gaussian", data=metab, control.predictor 
 
 Check the first few coefficients:
 
-```{r}
+```{r ridge-10}
 bcoef <- blrmod$summary.fixed[-1,1]
 head(bcoef)
 ```
 
 compared with the linear model coefficients:
 
-```{r}
+```{r ridge-11}
 head(coef(modlm)[-1])
 ```
 
@@ -146,7 +148,7 @@ Can see that the default prior on the betas is having some success in avoiding e
 
 Plot the coefficients
 
-```{r}
+```{r ridge-12}
 plot(wavelengths,bcoef,type="l",ylab="Ridge Coefficients")
 ```
 
@@ -154,7 +156,7 @@ Quite smooth. Even without doing ridge calculations, we get some smoothing effec
 
 See how well the test values are predicted:
 
-```{r}
+```{r ridge-13}
 predb <- blrmod$summary.fitted.values[173:215,1]
 plot(predb, testmeat$fat, xlab="Bayes posterior means", ylab="Observed values")
 abline(0,1)
@@ -165,7 +167,7 @@ This is a much better result than the standard lm or ridge RMSEs.
 
 Try it with less informative priors:
 
-```{r}
+```{r ridge-14}
 blrmodu <- inla(formula(modlm), family="gaussian", data=metab, control.fixed=list(mean=0,prec=1e-5), control.predictor = list(compute=TRUE))
 bcoef <- blrmodu$summary.fixed[-1,1]
 plot(wavelengths,bcoef,type="l",ylab="Ridge Coefficients")
@@ -173,7 +175,7 @@ plot(wavelengths,bcoef,type="l",ylab="Ridge Coefficients")
 
 The coefficients vary more.
 
-```{r}
+```{r ridge-15}
 predb <- blrmodu$summary.fitted.values[173:215,1]
 rmse(predb, testmeat$fat)
 ```
@@ -189,7 +191,7 @@ where beta are the fixed effects, being just the intercept in this example.
 The *b* are random effects for the coefficients of predictors. X is just 
 a column of ones while the Z matrix contains the original predictors. 
 
-```{r}
+```{r ridge-16}
 n <- nrow(meatspec)
 X <- matrix(1,nrow = n, ncol= 1)
 Z <- as.matrix(meatspec[,-101]) 
@@ -202,28 +204,28 @@ zmod <- inla(formula, data = list(y=y/scaley, idx.Z = 1:n, X=X), control.predict
 
 Check the predictive performance:
 
-```{r}
+```{r ridge-17}
 predb <- zmod$summary.fitted.values[173:215,1]*scaley
 rmse(predb, testmeat$fat)
 ```
 
 This is the best so far. Now make a plot of the coefficients:
 
-```{r}
+```{r ridge-18}
 rcoef <- zmod$summary.random$idx.Z[216:315,2]
 plot(wavelengths, rcoef, type="l", ylab="Coefficient")
 ```
 
 These are moderately rough. Look at the hyperparameters:
 
-```{r}
+```{r ridge-19}
 bri.hyperpar.summary(zmod)
 ```
 
 We see that the SD of the random effects is quite large which is related to the rough appearance
 of the coefficients. There is just one fixed effect:
 
-```{r}
+```{r ridge-20}
 zmod$summary.fixed
 ```
 
@@ -236,7 +238,7 @@ In this approach, we treat X as a random effect so we need an index for use in t
 just one X random effect but 100 Z random effects. The indices are NA for the components they do not
 represent.
 
-```{r}
+```{r ridge-21}
 pX = ncol(X); pZ = ncol(Z)
 idx.X = c(1:pX, rep(NA, pZ))
 idx.Z = c(rep(NA,pX), 1:pZ)
@@ -244,7 +246,7 @@ idx.Z = c(rep(NA,pX), 1:pZ)
 
 or
 
-```{r}
+```{r ridge-22}
 idx.X <- c(1, rep(NA,100))
 idx.Z <- c(NA, 1:100)
 ```
@@ -252,7 +254,7 @@ idx.Z <- c(NA, 1:100)
 
 We set some priors
 
-```{r}
+```{r ridge-23}
 hyper.fixed = list(prec = list(initial = log(1.0e-9), fixed=TRUE))
 param.data = list(prec = list(param = c(1.0e-3, 1.0e-3)))
 param.Z <- list(prec = list(param = c(1.0e-3, 1.0e-3)))
@@ -262,7 +264,7 @@ We need two `f()` terms. The single X effect is given a fixed very small precisi
 Z effects have a standard gamma prior for their precision. The fitting process works better if we
 scale down the response.
 
-```{r}
+```{r ridge-24}
 scaley = 100
 formula = y ~ -1 + f(idx.X,  model="iid", hyper = hyper.fixed) + f(idx.Z,  model="iid", hyper = param.Z)
 amod = inla(formula, data = list(y=y/scaley, idx.X=idx.X, idx.Z=idx.Z), control.predictor = list(A=cbind(X, Z),compute=TRUE), control.family = list(hyper = param.data))
@@ -271,7 +273,7 @@ amod = inla(formula, data = list(y=y/scaley, idx.X=idx.X, idx.Z=idx.Z), control.
 
 Check out the predictive performance:
 
-```{r}
+```{r ridge-25}
 predb <- amod$summary.fitted.values[173:215,1]
 rmse(predb, testmeat$fat/scaley)*scaley
 ```
@@ -281,7 +283,7 @@ A very similar result to the previous approach.
 
 Make a plot of the coefficients:
 
-```{r}
+```{r ridge-26}
 rcoef <- amod$summary.random$idx.Z[,2]
 plot(wavelengths, rcoef, type="l")
 ```

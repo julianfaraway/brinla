@@ -1,31 +1,31 @@
 ---
 title: Non-stationary smoothing with Gaussian process regression using INLA
-author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
-bibliography: ../INLA_book_latex/merged.bib
-date: "`r Sys.Date()`"
-output:
- html_document:
-  toc: true
+bibliography: merged.bib
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: github_document
 ---
 
 ```{r global_options, include=FALSE}
 library(knitr)
-knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
 options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
 knitr::knit_hooks$set(setPch = function(before, options, envir) {
   if(before) par(pch = 20)
 })
 opts_chunk$set(setPch = TRUE)
 ```
 
-See the [introduction](index.html) for more about INLA. See an example
-of [Gaussian process regression](gpreg.html).
+See the [introduction](index.md) for more about INLA. See an example
+of [Gaussian process regression](gpreg.md).
 The construction is detailed in 
 our [book](http://julianfaraway.github.io/brinla/).
 
 Load the packages (you may need to [install the brinla package](https://github.com/julianfaraway/brinla))
 
-```{r}
+```{r nonstat-1}
 library(INLA)
 library(brinla)
 ```
@@ -34,7 +34,7 @@ library(brinla)
 
 We simulate some data with a known true function.
 
-```{r}
+```{r nonstat-2}
 set.seed(1)
 n <- 100
 x <- seq(0, 1, length = n)
@@ -45,7 +45,7 @@ td <- data.frame(y = y, x = x, f.true)
 
 and plot it:
 
-```{r}
+```{r nonstat-3}
 plot(y ~ x, td)
 lines(f.true ~ x, td)
 ```
@@ -58,13 +58,13 @@ see examples of various smoothing methods applied to this data in [@Faraway:16b]
 The default fit uses priors based on the SD of the response and the range of the predictor
 to motivate sensible priors.
 
-```{r}
+```{r nonstat-4}
 gpmod = bri.gpr(td$x, td$y)
 ```
 
 We can plot the resulting fit and 95% credible bands
 
-```{r}
+```{r nonstat-5}
 plot(y ~ x, td, col = gray(0.75))
 lines(gpmod$xout, gpmod$mean)
 lines(gpmod$xout, gpmod$lcb, lty=2)
@@ -82,7 +82,7 @@ We can allow the smoothness to vary. A description of this can be found in [@lin
 in our [book](http://julianfaraway.github.io/brinla/). We have implemented this in our
 `brinla` package:
 
-```{r}
+```{r nonstat-6}
 fg <- bri.nonstat(td$x, td$y)
 plot(y ~ x, td, col = gray(0.75))
 lines(f.true ~ x, td, col = 2)
@@ -95,7 +95,7 @@ We achieve a smoother fit on the left but keep the less smooth fit on the right.
 
 # Package versions
 
-```{r}
+```{r nonstat-7}
 sessionInfo()
 ```
 

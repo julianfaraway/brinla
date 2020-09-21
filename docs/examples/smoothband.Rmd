@@ -1,31 +1,31 @@
 ---
 title: Confidence bands for smoothness with Gaussian process regression using INLA
-author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
-bibliography: ../INLA_book_latex/merged.bib
-date: "`r Sys.Date()`"
-output:
- html_document:
-  toc: true
+bibliography: merged.bib
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: github_document
 ---
 
 ```{r global_options, include=FALSE}
 library(knitr)
-knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
 options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
 knitr::knit_hooks$set(setPch = function(before, options, envir) {
   if(before) par(pch = 20)
 })
 opts_chunk$set(setPch = TRUE)
 ```
 
-See the [introduction](index.html) for more about INLA. See an example
+See the [introduction](index.md) for more about INLA. See an example
 of [Gaussian process regression](gpreg.html) using the same data.
 The construction is detailed in 
 our [book](http://julianfaraway.github.io/brinla/).
 
 Load the packages (you may need to [install the brinla package](https://github.com/julianfaraway/brinla))
 
-```{r}
+```{r smoothband-1}
 library(INLA)
 library(brinla)
 ```
@@ -35,14 +35,14 @@ library(brinla)
 We use the fossil example from [@bral:gsa:97] and used by [@chaud:jasa:99]. 
 We have the ratio of strontium isotopes found in fossil shells in the mid-Cretaceous period from about 90 to 125 million years ago. We rescale the response as in the SiZer paper.
 
-```{r}
+```{r smoothband-2}
 data(fossil, package="brinla")
 fossil$sr <- (fossil$sr-0.7)*100
 ```
 
 Plot the data:
 
-```{r}
+```{r smoothband-3}
 plot(sr ~ age, fossil, xlab="Age",ylab="Strontium Ratio")
 ```
 
@@ -51,7 +51,7 @@ plot(sr ~ age, fossil, xlab="Age",ylab="Strontium Ratio")
 The default fit uses priors based on the SD of the response and the range of the predictor
 to motivate sensible priors.
 
-```{r}
+```{r smoothband-4}
 gpmod = bri.gpr(fossil$age, fossil$sr)
 ```
 
@@ -76,7 +76,7 @@ In [@chaud:jasa:99], the question of whether there really is a dip (local minimu
 The presence of a dip at 98 is strongly determined by how much we smooth the function. Gaussian process regression controls this primarily through the range parameter. The curves shown on the figure derive from the maximum posterior value of this parameter. Yet there is considerable uncertainty in this parameter which has its own posterior distribution. We take the 2.5% and 97.5% percentiles of this range posterior and then plot the resulting function with the other parameters set at their maximum posterior values. The resulting two curves are shown in the following figure:
 
 
-```{r}
+```{r smoothband-5}
 fg <- bri.smoothband(fossil$age, fossil$sr)  
 plot(sr ~ age, fossil)
 lines(fg$xout, fg$rcb,lty=1)
@@ -93,7 +93,7 @@ I have also have a paper, [@STA4:STA4100] on the topic.
 
 # Package versions
 
-```{r}
+```{r smoothband-6}
 sessionInfo()
 ```
 
