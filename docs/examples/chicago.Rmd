@@ -1,0 +1,350 @@
+---
+title: INLA for linear regression
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,comment=NA, warning=FALSE, fig.path="figs/")
+```
+
+
+In this example, we compare the Bayesian model output with the linear model fit. Although the interpretation
+of these two fits is different, we expect similar numerical results provided the priors are not informative.
+
+See the [introduction](index.md) for an overview.
+Load the packages: (you may need to install them first)
+
+```{r chicago-1}
+library(ggplot2)
+library(INLA)
+library(faraway)
+library(gridExtra)
+library(brinla)
+```
+
+## Data
+
+Load in the Chicago Insurance dataset as analyzed in [Linear Models with R](http://people.bath.ac.uk/jjf23/LMR/index.html):
+
+```{r chicago-2}
+data(chredlin, package="faraway")
+```
+
+We take `involact` as the response. Make some plots of the data:
+
+```{r chicago-3}
+p1=ggplot(chredlin,aes(race,involact)) + geom_point() 
+p2=ggplot(chredlin,aes(fire,involact)) + geom_point() 
+p3=ggplot(chredlin,aes(theft,involact)) + geom_point()
+p4=ggplot(chredlin,aes(age,involact)) + geom_point() 
+p5=ggplot(chredlin,aes(income,involact)) + geom_point() 
+grid.arrange(p1,p2,p3,p4,p5)
+```
+
+## Linear model analysis
+
+Fit the standard linear model for reference purposes:
+
+```{r chicago-4}
+lmod <- lm(involact ~ race + fire + theft + age + log(income),  chredlin)
+sumary(lmod)
+```
+
+## INLA default model
+
+Run the default INLA model and compare to the `lm` output:
+
+```{r chicago-5}
+formula <- involact ~ race + fire + theft + age + log(income)
+imod <- inla(formula, family="gaussian", data=chredlin)
+cbind(imod$summary.fixed[,1:2],summary(lmod)$coef[,1:2])
+```
+
+The first two columns are the posterior means and SDs from the INLA fit while
+the third and fourth are the corresponding values from the lm fit. We can
+see they are almost identical. We expect this.
+
+We can get the posterior for the SD of the error as:
+
+```{r chicago-6}
+bri.hyperpar.summary(imod)
+```
+
+which compares with the linear model estimate of:
+
+```{r chicago-7}
+summary(lmod)$sigma
+```
+
+which gives a very similar result. But notice that the Bayesian output gives us more
+than just a point estimate.
+
+The function `inla.hyperpar()` is advertized to improve the estimates of the hyperparameters (just sigma here)
+but makes very little difference in this example:
+
+```{r chicago-8}
+bri.hyperpar.summary(inla.hyperpar(imod))
+```
+
+## Plots of the posteriors
+
+For the error SD
+
+```{r chicago-9}
+bri.hyperpar.plot(imod)
+```
+
+For the fixed parameters:
+
+```{r chicago-10}
+bri.fixed.plot(imod)
+```
+
+We can use these plots to judge which parameters may be different from zero. For age, fire, race and theft, we see
+the posterior density is well away from zero but for log(income) there is an overlap. This can be qualitatively 
+compared to the p-values from the linear model output. The conclusions are compatible although the 
+motivation and justifactions are different.
+
+## Fitted values
+
+We need to set the control.predictor to compute the posterior means of the linear predictors:
+
+```{r chicago-11}
+result <- inla(formula, family="gaussian", control.predictor=list(compute=TRUE),data=chredlin)
+ypostmean <- result$summary.linear.predictor
+```
+
+Compare these posterior means to the lm() fitted values:
+
+```{r chicago-12}
+plot(ypostmean[,1],lmod$fit, xlab="INLA posterior fitted means", ylab="LM fitted values")
+abline(0,1)
+```
+
+Can see these are the same. Now compare the SDs from INLA with the SEs from the LM fit:
+
+```{r chicago-13}
+lmfit <- predict(lmod, se=TRUE)
+plot(ypostmean[,2], lmfit$se.fit, xlab="INLA posterior SDs", ylab="LM fitted SEs")
+abline(0,1)
+```
+
+We see that these are the same.
+
+## Prediction
+
+Suppose we wish to predict the response at a new set of inputs. We add a case
+for the new inputs and set the response to missing:
+
+```{r chicago-14}
+newobs = data.frame(race=25,fire=10,theft=30,age=65,involact=NA,income=11,side="s")
+chpred = rbind(chredlin,newobs)
+```
+
+We fit the model as before:
+
+```{r chicago-15}
+respred <- inla(formula, family="gaussian", control.predictor=list(compute=TRUE), data=chpred)
+respred$summary.fixed
+```
+
+The output is the same as before as expected. The fitted value for the last observation (the new 48th observation)
+provides the posterior distribution for the linear predictor corresponding to the new set of inputs.
+
+```{r chicago-16}
+respred$summary.fitted.values[48,]
+```
+
+We might compare this to the standard linear model prediction:
+
+```{r chicago-17}
+predict(lmod, newdata=newobs, interval = "confidence", se=TRUE)
+```
+
+We get the essentially the same outcome. These answers only reflect variability in the linear predictor. 
+
+
+Usually we want to include the variation due to a new error. This requires more effort. One solution 
+is based on simulation. We can sample from the posterior we have just calculated and sample from
+the posterior for the error distribution. Adding these together, we will get a sample from the posterior
+predictive distribution. Although this can be done quickly, it goes against the spirit of INLA by using
+simulation.
+
+
+We can compute an approximation for the posterior predictive distribution using some trickery.
+We set up an index variable `idx`. We add a *random effect* term using this index with the `f()`
+function. This is a mean zero Gaussian random variable whose variance is a hyperparameter. This
+term functions exactly the same as the usual error term. Since the model will also add an error term,
+we would be stuck with two essentially identical terms. But we are able to knock out the usual error term
+by specifying that it have a very high precision (i.e. it will vary just a little bit). In this way, our
+random effect term will take almost all the burden of representing this variation.
+
+
+```{r chicago-18}
+chpred$idx <- 1:48
+eformula <- involact ~ race + fire + theft + age + log(income) + f(idx, model="iid", hyper = list(prec = list(param=c(1, 0.01))))
+respred <- inla(eformula, data = chpred, control.predictor = list(compute=TRUE), control.family=list(initial=12,fixed=TRUE))
+bri.hyperpar.summary(respred)
+```
+
+We see that the SD for the index variable is about the same as the previous SD for the error. Look at the predictive distribution:
+
+```{r chicago-19}
+respred$summary.fitted.values[48,]
+```
+
+We can compare this to the linear model prediction interval:
+
+```{r chicago-20}
+predict(lmod,newdata=newobs,interval="prediction")
+```
+
+The results are similar but not the same. Notice that the lower end of the intervals are both negative which should
+not happen with a strictly positive response. But that's not the fault of this process but of our choice of model.
+
+Here is a posterior predictive density for the prediction:
+
+```{r chicago-21}
+ggplot(data.frame(respred$marginals.fitted.values[[48]]),aes(x,y))+geom_line()+ylab("Density")+xlab("involact")
+```
+
+We see the problem of having density for values less than zero.
+
+For more on this, see the [Google groups INLA mailing list](https://groups.google.com/forum/#!topic/r-inla-discussion-group/2FYu8lAqid4) discussion.
+
+## Conditional Predictive Ordinates and Probability Integral Transform
+
+
+Bayesian diagnostic methods can use these statistics. We need to ask for them
+at the time we fit the model:
+
+```{r chicago-22}
+imod <- inla(formula, family="gaussian", data=chredlin, control.compute=list(cpo=TRUE))
+```
+
+The CPO is the probability density of an observed response based on the model fit to the rest of the data. We
+are interested in small values of the CPO since these represent unexpected response values.
+Plot the CPOs:
+
+```{r chicago-23}
+n = nrow(chredlin)
+plot(1:n,imod$cpo$cpo, ylab="CPO",type="n")
+text(1:n,imod$cpo$cpo, 1:n)
+```
+
+Observations 3, 6 and 35 have particularly low values. We might compare these to the jacknife residuals (an analogous quantity)
+from the standard linear model:
+
+```{r chicago-24}
+plot(imod$cpo$cpo, abs(rstudent(lmod)), xlab="CPO",ylab="Absolute residuals", type="n")
+text(imod$cpo$cpo, abs(rstudent(lmod)), 1:n)
+```
+
+We can see the two statistics are related. They pick out the same three observations.
+
+The PIT is the probability of a new response less than the observed response using a model based
+on the rest of the data. We'd expect the PIT values to be uniformly distributed if the model assumptions
+are correct.
+
+```{r chicago-25}
+pit <- imod$cpo$pit
+uniquant <- (1:n)/(n+1)
+plot(uniquant, sort(pit), xlab="uniform quantiles", ylab="Sorted PIT values")
+abline(0,1)
+```
+
+Looks good - no indication of problems. Might be better to plot these on a logit scale because probabilities
+very close to 0 or 1 won't be obvious from the above plot.
+
+```{r chicago-26}
+plot(logit(uniquant), logit(sort(pit)), xlab="uniform quantiles", ylab="Sorted PIT values", main="Logit scale")
+abline(0,1)
+```
+
+This marks out three points as being somewhat unusual:
+
+```{r chicago-27}
+which(abs(logit(pit)) > 4)
+```
+
+The same three points picked out by the CPO statistic.
+
+We can compare the PIT values and posterior means for the fitted values (which are the same as
+the fitted values from the linear model fit).
+
+
+```{r chicago-28}
+plot(predict(lmod), pit, xlab="Posterior fitted means", ylab="PIT")
+```
+
+This indicates some problems for low values. Since the response is strictly positive and this is
+not reflected in our models, this does spot a real flaw in our model.
+
+Incidentally, a similar conclusion can be made from the standard linear model diagnostic:
+
+
+```{r chicago-29}
+plot(lmod,1)
+```
+
+which looks fairly similar. In this example, we might try something other than a Gaussian response which reflects the
+zero response values.
+
+We can also plot the PITs against the predictors - for example:
+
+```{r chicago-30}
+plot(chredlin$race, pit, xlab="Minority percentage", ylab="PIT")
+```
+
+Which shows no problems with the fit.
+
+## Model Selection
+
+We need to ask to get the Watanabe AIC (WAIC) and deviance information criterion DIC calculated:
+
+```{r chicago-31}
+imod <- inla(formula, family="gaussian", data=chredlin, control.compute=list(dic=TRUE, waic=TRUE))
+```
+
+which produces:
+
+```{r chicago-32}
+c(WAIC=imod$waic$waic, DIC=imod$dic$dic)
+```
+
+We do not have many predictors here so exhaustive search is feasible.
+We fit all models that include race but with some combination of the other four predictors. Use `lm()` to get
+the AIC but INLA to get DIC and WAIC
+
+
+```{r chicago-33}
+listcombo <- unlist(sapply(0:4,function(x) combn(4, x, simplify=FALSE)),recursive=FALSE)
+predterms <- lapply(listcombo, function(x) paste(c("race",c("fire","theft","age","log(income)")[x]),collapse="+"))
+coefm <- matrix(NA,16,3)
+for(i in 1:16){
+    formula <- as.formula(paste("involact ~ ",predterms[[i]]))
+    lmi <- lm(formula, data=chredlin)
+    result <- inla(formula, family="gaussian", data=chredlin, control.compute=list(dic=TRUE, waic=TRUE))
+    coefm[i,1] <- AIC(lmi)
+    coefm[i,2] <- result$dic$dic
+    coefm[i,3] <- result$waic$waic
+}
+rownames(coefm) <- predterms
+colnames(coefm) <- c("AIC","DIC","WAIC")
+round(coefm,4)
+```
+
+The model corresponding to the minimum value of the criterion is the same for all three. We would
+choose `involact ~ race+fire+theft+age`.
+
+## Conclusion
+
+We see that the standard linear modeling and the Bayesian approach using INLA produce very similar results. On
+one hand, one might decide to stick with the standard approach since it is easier. But on the other hand, this
+does give the user confidence to use the Bayesian approach with INLA because it opens up other possibilities
+with the model fitting and interpretation. The consistency between the approaches in the default settings is reassuring. 
+
+
+

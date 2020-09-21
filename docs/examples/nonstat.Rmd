@@ -1,0 +1,111 @@
+---
+title: Non-stationary smoothing with Gaussian process regression using INLA
+author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+bibliography: ../INLA_book_latex/merged.bib
+date: "`r Sys.Date()`"
+output:
+ html_document:
+  toc: true
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+options(digits=5,show.signif.stars=FALSE,width=120)
+knitr::knit_hooks$set(setPch = function(before, options, envir) {
+  if(before) par(pch = 20)
+})
+opts_chunk$set(setPch = TRUE)
+```
+
+See the [introduction](index.html) for more about INLA. See an example
+of [Gaussian process regression](gpreg.html).
+The construction is detailed in 
+our [book](http://julianfaraway.github.io/brinla/).
+
+Load the packages (you may need to [install the brinla package](https://github.com/julianfaraway/brinla))
+
+```{r}
+library(INLA)
+library(brinla)
+```
+
+# Data
+
+We simulate some data with a known true function.
+
+```{r}
+set.seed(1)
+n <- 100
+x <- seq(0, 1, length = n)
+f.true <- (sin(2 * pi * (x)^3))^3
+y <- f.true + rnorm(n, sd = 0.2)
+td <- data.frame(y = y, x = x, f.true)
+```
+
+and plot it:
+
+```{r}
+plot(y ~ x, td)
+lines(f.true ~ x, td)
+```
+
+This function is challenging to fit because of the varying amount of smoothness. You can
+see examples of various smoothing methods applied to this data in [@Faraway:16b].
+
+# GP fitting
+
+The default fit uses priors based on the SD of the response and the range of the predictor
+to motivate sensible priors.
+
+```{r}
+gpmod = bri.gpr(td$x, td$y)
+```
+
+We can plot the resulting fit and 95% credible bands
+
+```{r}
+plot(y ~ x, td, col = gray(0.75))
+lines(gpmod$xout, gpmod$mean)
+lines(gpmod$xout, gpmod$lcb, lty=2)
+lines(gpmod$xout, gpmod$ucb, lty=2)
+lines(f.true ~ x, td, col=2)
+```
+
+On the right end of the function, the fit is too rough. On the left end, it is too smooth. The minimum at 0.9 is
+underestimated and the true function is even outside the credibility bands in this region. The problem
+is that the standard method uses the same amount of smoothness everywhere.
+
+# Variable smoothness
+
+We can allow the smoothness to vary. A description of this can be found in [@lind:rue:jss:15] and also
+in our [book](http://julianfaraway.github.io/brinla/). We have implemented this in our
+`brinla` package:
+
+```{r}
+fg <- bri.nonstat(td$x, td$y)
+plot(y ~ x, td, col = gray(0.75))
+lines(f.true ~ x, td, col = 2)
+lines(fg$xout, fg$lcb, lty=2)
+lines(fg$xout, fg$ucb, lty=2)
+lines(fg$xout, fg$mean)
+```
+
+We achieve a smoother fit on the left but keep the less smooth fit on the right.
+
+# Package versions
+
+```{r}
+sessionInfo()
+```
+
+
+
+# References
+
+
+
+
+
+
+

@@ -1,0 +1,207 @@
+---
+title: Extreme values using INLA
+author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+bibliography: ../INLA_book_latex/merged.bib
+date: "`r Sys.Date()`"
+output:
+ html_document:
+  toc: true
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+options(digits=5,show.signif.stars=FALSE,width=120)
+knitr::knit_hooks$set(setPch = function(before, options, envir) {
+  if(before) par(pch = 20)
+})
+opts_chunk$set(setPch = TRUE)
+```
+
+See the [introduction](index.html) for more about INLA. Load in the packages:
+
+
+```{r}
+library(INLA)
+library(brinla)
+```
+
+# Data
+
+Extreme flows in rivers are of special interest since flood defences must be designed with these in mind. The
+National River Flow Archive provides data about river flows in the United Kingdom. For this example, we consider
+data on annual maximum flow rates from the River Calder in Cumbria, England from 1973 to 2014:
+
+```{r}
+data(calder, package = "brinla")
+plot(Flow ~ WaterYear, calder)
+```
+
+Rescale year for convenience:
+
+```{r}
+calder$year = calder$WaterYear-1973
+```
+
+# Generalized Extreme value distribution
+
+Some scaling is necessary to get the model to fit. Generalized extreme value distributions are
+notoriously difficult to fit. It is not unusual to see failures to fit which require some tinkering
+to rectify. The current implementation is marked as experimental so you may experience
+some difficulties with the fit. We will need the `control.compute = list(config=TRUE)` in the computations later in this example.
+
+```{r}
+imod <- inla(Flow ~ 1 + year, data = calder, family = "gev", scale = 0.1, control.compute = list(config=TRUE))
+imod$summary.fixed
+```
+
+We can see that there is positive linear trend term indicating the peak flows for this
+river are increasing over time. We can plot the fixed effect posterior for the year:
+
+```{r}
+plot(imod$marginals.fixed$year, type="l")
+```
+
+We can see that the posterior for the trend in year is concentrated above zero indicating evidence
+of an increasing trend. Probability that slope is negative is:
+
+```{r}
+inla.pmarginal(0, imod$marginals.fixed$year)
+```
+
+Rather small.
+
+Plot the posterior for the precision:
+
+```{r}
+plot(imod$marginals.hyperpar$`precision for GEV observations`,type="l",xlim=c(0,0.1))
+```
+
+or plot that on an SD scale:
+
+```{r}
+plot(bri.hyper.sd(imod$marginals.hyperpar$`precision for GEV observations`),type="l")
+```
+
+Plot the posterior for the shape parameter:
+
+```{r}
+plot(imod$marginals.hyperpar$`shape-parameter for gev observations`,type="l",xlim=c(-0.2,0.5))
+```
+
+A small chance that this is negative.
+
+# Predictions
+
+The maximum flow over the period observation occured in the 1997 water year measuring 173.17 m^3/s. Under our fitted
+model, what was the probability of observing such a flow (or greater)? This will give us a measure of how unusual this
+event was. First we need an `R` function to compute P(Y < y) for the generalized extreme value distribution:
+
+```{r}
+pgev = function(y,xi,tau,eta,sigma=1){
+  exp(-(1+xi*sqrt(tau*sigma)*(y-eta))^(-1/xi))
+}
+```
+
+Compute probability of observed flow less than this maximum flow in 1997:
+
+```{r}
+yr = 1997-1973
+maxflow = 173.17
+eta = sum(c(1,yr)*imod$summary.fixed$mean)
+tau = imod$summary.hyperpar$mean[1]
+xi = imod$summary.hyperpar$mean[2]
+sigma = 0.1
+(pless = pgev(maxflow, xi, tau, eta,sigma))
+```
+
+So probability of exceeding the observed value is:
+
+```{r}
+1-pless
+```
+
+Hydrologists often work with the expected
+time for the event to occur called the *recurrence interval*. In this case, the value is:
+
+```{r}
+1/(1-pless)
+```
+
+Now set year to 2017:
+
+```{r}
+yr = 2017-1973
+maxflow = 173.17
+eta = sum(c(1,yr)*imod$summary.fixed$mean)
+tau = imod$summary.hyperpar$mean[1]
+xi = imod$summary.hyperpar$mean[2]
+sigma = 0.1
+pless = pgev(maxflow, xi, tau, eta,sigma)
+1/(1-pless)
+```
+
+We see that the recurrence interval substantially reduced.
+
+# Credibility interval
+
+Can compute a 95% credibility interval. Need to sample from the full posterior. This is
+where we need the `control.compute = list(config=TRUE)` option.
+
+```{r}
+nsamp = 999
+postsamp = inla.posterior.sample(nsamp, imod)
+pps = t(sapply(postsamp, function(x) c(x$hyperpar, x$latent[42:43])))
+colnames(pps) <- c("precision","shape","beta0","beta1")
+```
+
+Plot the sampled hyperparameters:
+
+```{r}
+plot(pps[,1],pps[,2]*0.01,xlab="Precision",ylab="Shape")
+```
+
+We see that the sampled hyperparameters are concentrated on a sparse grid. Here is the sampled posterior
+for the linear model parameters:
+
+```{r}
+plot(pps[,3],pps[,4])
+```
+
+No problem with this. We compute the recurrency interval for each sample.
+
+```{r}
+sigma = 0.1
+maxflow = 173
+retp = numeric(nsamp)
+for(i in 1:nsamp){
+  eta = sum(c(1,yr)*pps[i,3:4])
+  tau = pps[i,1]
+  xi = 0.01*pps[i,2]
+  pless = pgev(maxflow, xi, tau, eta,sigma)
+  retp[i] = 1/(1-pless)
+}
+```
+
+From this we can compute the credibility interval:
+
+```{r}
+quantile(retp, c(0.025, 0.5, 0.975))
+```
+
+This is quite wide. If we want a denser grid for the hyperparameters, we can redo INLA with a smaller step size
+for the grid. We will get denser coverage but it's still a grid. This is somewhat undesirable but not as bad
+as it seems because these are the integration points.
+
+# Package versions
+
+```{r}
+sessionInfo()
+```
+
+
+
+# References
+
+
+

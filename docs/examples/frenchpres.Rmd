@@ -1,0 +1,134 @@
+---
+title: "Regression with bounded coefficients"
+author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+options(digits=5,show.signif.stars=FALSE,width=120)
+```
+
+See the [introduction](index.html) for an overview.
+Load the libraries:
+
+```{r}
+library(INLA)
+library(faraway)
+```
+
+## Data
+
+Data come from the `faraway` package. The help page reads:
+
+Elections for the French presidency proceed in two rounds. In 1981, there were 10 candidates in the first round. The top two candidates then went on to the second round, which was won by Francois Mitterand over Valery Giscard-d'Estaing. The losers in the first round can gain political favors by urging their supporters to vote for one of the two finalists. Since voting is private, we cannot know how these votes were transferred, we might hope to infer from the published vote totals how this might have happened. Data is given for vote totals in every fourth department of France:
+
+```{r}
+data(fpe,package="faraway")
+head(fpe)
+```
+
+Proportion voting for Mitterand in second round is made up from some proportion of first round
+votes:
+
+```{r}
+lmod <- lm(A2 ~ A+B+C+D+E+F+G+H+J+K+N-1, fpe)
+coef(lmod)
+```
+
+But all these coefficients should lie in the range [0,1]. Note we have ignored the fact that the number of voters in each department varies so we should use weights. 
+
+Can recursively set coefficients to the boundary to find a valid solution but this is not optimal. Instead, can solve the least squares problem with inequality constraints:
+
+```{r}
+library(mgcv)
+M <- list(w=rep(1,24),X=model.matrix(lmod), y=fpe$A2, Ain=rbind(diag(11),-diag(11)), C=matrix(0,0,0), array(0,0), S=list(), off=NULL, p=rep(0.5,11), bin=c(rep(0,11), rep(-1,11)))
+a <- pcls(M)
+names(a) <- colnames(model.matrix(lmod))
+round(a,3)
+```
+
+But this gives no uncertainties on the estimates.
+
+# Bayes linear model with constraints
+
+The `clinear` latent model in INLA allows us to constrain the values of the parameter within a specified range - in this case [0,1].
+The default version of this model is:
+
+```{r}
+cmod <- inla(A2 ~ -1 + 
+               f(A, model = "clinear", range = c(0, 1)) + 
+               f(B, model = "clinear", range = c(0, 1)) + 
+               f(C, model = "clinear", range = c(0, 1)) + 
+               f(D, model = "clinear", range = c(0, 1)) + 
+               f(E, model = "clinear", range = c(0, 1)) + 
+               f(F, model = "clinear", range = c(0, 1)) + 
+               f(G, model = "clinear", range = c(0, 1)) + 
+               f(H, model = "clinear", range = c(0, 1)) + 
+               f(J, model = "clinear", range = c(0, 1)) + 
+               f(K, model = "clinear", range = c(0, 1)) + 
+               f(N, model = "clinear", range = c(0, 1)), 
+              family="gaussian",data=fpe)
+cmod$summary.hyperpar
+```
+
+But this does not produce the expected results as the posterior means are all in the midrange whereas our previous analysis leads us
+to expect some of them to be close to zero or one. The problem is that the slope parameters are re-expressed as
+
+$$
+\beta = \frac{\exp (\theta)}{1+ \exp (\theta)}
+$$
+
+and the prior is put on theta. The logit transformation means that much of the weight is put on the midrange and less on the regions close
+to zero and one.
+
+The `logitbeta` prior conveniently allows us to express the prior on the slope parameter as a beta distribution. If we choose the
+hyperparameters of beta(a,b) with both a and b small, values close to zero or one will be preferred. Here is the density of beta(0.5,0.5)
+
+```{r}
+x = seq(0,1,length.out = 100)
+plot(x,dbeta(x,0.5,0.5),type="l")
+```
+
+This seems reasonable since we expect supporters of minor parties to throw support almost exclusively to one of the two final round 
+candidates.
+
+```{r}
+bprior = list(theta = list(prior = "logitbeta", param=c(0.5,0.5)))
+cmod <- inla(A2 ~ -1 + 
+               f(A, model = "clinear", range = c(0, 1), hyper = bprior) + 
+               f(B, model = "clinear", range = c(0, 1), hyper = bprior) + 
+               f(C, model = "clinear", range = c(0, 1), hyper = bprior) + 
+               f(D, model = "clinear", range = c(0, 1), hyper = bprior) + 
+               f(E, model = "clinear", range = c(0, 1), hyper = bprior) + 
+               f(F, model = "clinear", range = c(0, 1), hyper = bprior) + 
+               f(G, model = "clinear", range = c(0, 1), hyper = bprior) + 
+               f(H, model = "clinear", range = c(0, 1), hyper = bprior) + 
+               f(J, model = "clinear", range = c(0, 1), hyper = bprior) + 
+               f(K, model = "clinear", range = c(0, 1), hyper = bprior) + 
+               f(N, model = "clinear", range = c(0, 1), hyper = bprior), 
+              family="gaussian",data=fpe)
+cmod$summary.hyperpar$mode
+```
+
+We can plot the posteriors for each of the candidates in the first round:
+
+```{r}
+plot(cmod$marginals.hyperpar$`Beta for B`,type="l", xlab = "p", ylab="density",main="Transfer proportion for candidate B")
+```
+
+We see that almost all candidate B (Giscard) first round voters did *not* vote for Mitterand in the second round. In contrast,
+
+```{r}
+plot(cmod$marginals.hyperpar$`Beta for E`,type="l", xlab = "p", ylab="density",main="Transfer proportion for candidate E")
+```
+
+E was the Ecology party. We see that Ecology party supporters divided their allegiance between the two candidates but with some apparent preference
+for A (Mitterand).
+
+
+
+
+
+
