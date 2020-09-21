@@ -1,0 +1,122 @@
+---
+title: INLA analysis of Latin Square design - one fixed and two crossed random effects
+author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+ html_document:
+  toc: true
+  theme: cosmo
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+options(digits=5,show.signif.stars=FALSE,width=120)
+```
+
+See the [introduction](index.html) for an overview. Also see [other analyses](../mixchange/abrasion.html) of this data.
+See the textbook for a full discussion. See a [STAN analysis](../stan/crossed.html) of the same data.
+
+Load the libraries:
+
+```{r}
+library(ggplot2)
+library(INLA)
+```
+
+# Data
+
+```{r}
+data(abrasion, package="faraway")
+abrasion
+ggplot(abrasion,aes(x=material, y=wear, shape=run, color=position))+geom_point(position = position_jitter(width=0.1, height=0.0))
+```
+
+# Default prior model
+
+
+```{r}
+formula <- wear ~ material + f(run, model="iid") + f(position, model="iid")
+result <- inla(formula, family="gaussian", data=abrasion)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+The run and position precisions look far too high. Need to change the default prior
+
+# Informative Gamma priors on the precisions
+
+Now try more informative gamma priors for the random effect precisions. Define it so
+the mean value of gamma prior is set to the inverse of the variance of
+the residuals of the fixed-effects only model. We expect the error
+variances to be lower than this variance so this is an overestimate.
+The variance of the gamma prior (for the precision) is controlled by
+the `apar` shape parameter.
+
+```{r}
+apar <- 0.5
+lmod <- lm(wear ~ material, abrasion)
+bpar <- apar*var(residuals(lmod))
+lgprior <- list(prec = list(prior="loggamma", param = c(apar,bpar)))
+formula = wear ~ material+f(run, model="iid", hyper = lgprior)+f(position, model="iid", hyper = lgprior)
+result <- inla(formula, family="gaussian", data=abrasion)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the transforms to an SD scale for the random effect terms. Make a table of summary statistics for the posteriors:
+
+```{r sumstats}
+sigmarun <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[2]])
+sigmapos <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[3]])
+sigmaepsilon <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[1]])
+restab=sapply(result$marginals.fixed, function(x) inla.zmarginal(x,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmarun,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmapos,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaepsilon,silent=TRUE))
+colnames(restab) = c("mu","B-A","C-A","D-A","run","position","epsilon")
+data.frame(restab)
+```
+
+Also construct a plot the SD posteriors:
+
+```{r plotsds}
+ddf <- data.frame(rbind(sigmarun,sigmapos,sigmaepsilon),errterm=gl(3,1024,labels = c("run","position","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("wear")+ylab("density")+xlim(0,35)
+```
+
+Posteriors look OK although no weight given to smaller values.
+
+# Penalized Complexity Prior
+
+In [Simpson et al (2015)](http://arxiv.org/abs/1403.4630v3), penalized complexity priors are proposed. This
+requires that we specify a scaling for the SDs of the random effects. We use the SD of the residuals
+of the fixed effects only model (what might be called the base model in the paper) to provide this scaling.
+
+```{r}
+lmod <- lm(wear ~ material, abrasion)
+sdres <- sd(residuals(lmod))
+pcprior <- list(prec = list(prior="pc.prec", param = c(3*sdres,0.01)))
+formula = wear ~ material+f(run, model="iid", hyper = pcprior)+f(position, model="iid", hyper = pcprior)
+result <- inla(formula, family="gaussian", data=abrasion)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the summaries as before:
+
+```{r ref.label="sumstats"}
+```
+
+Make the plots:
+
+```{r ref.label="plotsds"}
+```
+
+Posteriors put more weight on lower values compared to gamma prior.
+Some work is necessary to correctly compute the tails of the densities.
+
+# Package version info
+
+```{r}
+sessionInfo()
+```

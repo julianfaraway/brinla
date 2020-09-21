@@ -1,0 +1,151 @@
+---
+title: INLA analysis of block design - one fixed and one random effect
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: github_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
+options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
+knitr::knit_hooks$set(setPch = function(before, options, envir) {
+  if(before) par(pch = 20)
+})
+opts_chunk$set(setPch = TRUE)
+```
+
+See the [introduction](index.md) for an overview. 
+Load the libraries:
+
+```{r}
+library(ggplot2)
+library(INLA)
+```
+
+# Data
+
+Load in and plot the data:
+
+```{r peni}
+data(penicillin, package="faraway")
+summary(penicillin)
+library(ggplot2, quietly=TRUE)
+ggplot(penicillin,aes(x=blend,y=yield,group=treat,linetype=treat))+geom_line()
+ggplot(penicillin,aes(x=treat,y=yield,group=blend,linetype=blend))+geom_line()
+```
+
+# Default prior model
+
+Fit the default INLA model:
+
+```{r}
+formula = yield ~ treat+f(blend, model="iid")
+result = inla(formula, family="gaussian", data=penicillin)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Precision for the blend effect looks implausibly large. Problem with default gamma prior.
+
+# Half-normal priors on the SDs
+
+Try a half-normal prior on the blend precision. I have used variance of the response to help with the scaling so these
+are more informative.
+
+```{r}
+resprec <- 1/var(penicillin$yield)
+formula = yield ~ treat+f(blend, model="iid", prior="logtnormal", param=c(0, resprec))
+result = inla(formula, family="gaussian", data=penicillin)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Looks more plausible.
+Compute the transforms to an SD scale for the blend and error. Make a table of summary statistics for the posteriors:
+
+```{r sumstats}
+sigmaalpha <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[2]])
+sigmaepsilon <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[1]])
+restab=sapply(result$marginals.fixed, function(x) inla.zmarginal(x,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaalpha,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaepsilon,silent=TRUE))
+restab=cbind(restab, sapply(result$marginals.random$blend,function(x) inla.zmarginal(x, silent=TRUE)))
+colnames(restab) = c("mu","B-A","C-A","D-A","alpha","epsilon",levels(penicillin$blend))
+data.frame(restab)
+```
+
+Also construct a plot the SD posteriors:
+
+```{r plotsds}
+ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),labels = c("alpha","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,15)
+```
+
+Posterior for the blend SD is more diffuse than the error SD. Posterior for the blend SD has non-zero density at zero.
+
+# Informative gamma priors on the precisions
+
+Now try more informative gamma priors for the precisions. Define it so the mean value of gamma prior is set to the inverse of the
+variance of the fixed-effects model residuals. We expect the two error variances to be lower than this variance so this is an overestimate.
+The variance of the gamma prior (for the precision) is controlled by the `apar` shape parameter - smaller values are less informative.
+
+```{r}
+apar <- 0.5
+lmod <- lm(yield ~ treat, data=penicillin)
+bpar <- apar*var(residuals(lmod))
+lgprior <- list(prec = list(prior="loggamma", param = c(apar,bpar)))
+formula = yield ~ treat+f(blend, model="iid", hyper = lgprior)
+result <- inla(formula, family="gaussian", data=penicillin)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the summaries as before:
+
+```{r  ref.label="sumstats"}
+```
+
+Make the plots:
+
+```{r penigam, ref.label="plotsds"}
+```
+
+Posterior for blend SD has no weight near zero.
+
+# Penalized Complexity Prior
+
+In [Simpson et al (2015)](http://arxiv.org/abs/1403.4630v3), penalized complexity priors are proposed. This
+requires that we specify a scaling for the SDs of the random effects. We use the SD of the residuals
+of the fixed effects only model (what might be called the base model in the paper) to provide this scaling.
+
+```{r}
+lmod <- lm(yield ~ treat, data=penicillin)
+sdres <- sd(residuals(lmod))
+pcprior <- list(prec = list(prior="pc.prec", param = c(3*sdres,0.01)))
+formula <- yield ~ treat + f(blend, model="iid", hyper = pcprior)
+result <- inla(formula, family="gaussian", data=penicillin)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the summaries as before:
+
+```{r ref.label="sumstats"}
+```
+
+Make the plots:
+
+```{r penipc, ref.label="plotsds"}
+```
+
+Posterior for blend SD has some weight near zero. Results are comparable to previous analyses.
+
+
+# Package version info
+
+```{r}
+sessionInfo()
+```

@@ -1,7 +1,7 @@
----
-title: INLA for Bayesian Regression Models
-author: "[Julian Faraway](https://julianfaraway.github.io/)"
----
+# Examples using INLA for Bayesian Regression Models
+
+by [Julian Faraway](https://julianfaraway.github.io/)
+
 
 You will need to [install the brinla R package](https://github.com/julianfaraway/brinla) to run the examples described here.
 
@@ -21,6 +21,21 @@ some are not found in the book and some are experimental.
 - [Define your own prior](prior.md) - using a half Cauchy prior for the SD of a random effect.
 - [Linear regression with bounded parameters](frenchpres.md) - French presidential election example with slope parameters bounded in [0,1]
 
-See also [linear mixed models examples](../inla/index.html) from my
-[Extending Linear Models with R](http://people.bath.ac.uk/jjf23/ELM/index.html) book.
+# Linear Mixed Model Examples
 
+These come from my [Extending Linear Models with R](http://people.bath.ac.uk/jjf23/ELM/index.html) book.
+I demonstrate these methods for each of the examples in the
+text. You'll need to read the text for more background on datasets and the interpretations
+or you can just look at the help pages for the datasets. I've focussed attention on the
+process for fitting the model and summaries. There's lots more you can do
+so these analyses are far from complete.
+
+- [Single Random Effect](oneway.md) - the `pulp` data
+- [One Fixed and One Random Effect](rbd.md) - the `penicillin` data
+- [Split Plots](split.md) - the `irrigation` data
+- [Nested Effects](nested.md) - the `eggs` data
+- [Crossed Effects](crossed.md) - the `abrasion` data
+- [Multilevel Models](multilevel.md) - the `jsp` data
+- [Longitudinal Models](longitudinal.md) - the `psid` data
+- [Repeated Measures](repeated.md) - the `vision` data
+- [Multiple Response Models](multiple.md) - the `jsp` data

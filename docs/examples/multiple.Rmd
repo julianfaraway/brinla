@@ -1,0 +1,142 @@
+---
+title: INLA analysis of a Multiple Response Multilevel  model
+author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+ html_document:
+  toc: true
+  theme: cosmo
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+options(digits=5,show.signif.stars=FALSE,width=96)
+```
+
+See the [introduction](index.html) for an overview. Also see [other analyses](../mixchange/multiple.html) of this data.
+See the textbook for a full discussion. See a [STAN analysis](../stan/multiple.html) of the same data.
+
+Load the libraries:
+
+```{r}
+library(ggplot2)
+library(INLA)
+```
+
+# Data
+
+Load in and summarize the data:
+
+```{r}
+data(jsp, package="faraway")
+jspr <- jsp[jsp$year==2,]
+mjspr <- data.frame(rbind(jspr[,1:6],jspr[,1:6]),subject=factor(rep(c("english","math"),c(953,953))),score=c(jspr$english/100,jspr$math/40))
+mjspr$craven <- mjspr$raven-mean(mjspr$raven)
+
+```
+
+Plot the data
+```{r}
+ggplot(mjspr, aes(x=raven, y=score))+geom_jitter(alpha=0.25)+facet_grid(gender ~ subject)
+```
+
+
+
+# Default prior model
+
+Need to construct unique labels for nested factor levels of class and student:
+
+
+```{r}
+mjspr$school <- factor(mjspr$school)
+mjspr$classch <- factor(paste(mjspr$school,mjspr$class,sep="."))
+mjspr$classchid <- factor(paste(mjspr$school,mjspr$class,mjspr$id,sep="."))
+```
+
+```{r}
+formula <- score ~ subject*gender+craven*subject+social + f(school, model="iid") + f(classch, model="iid") + f(classchid, model="iid")
+result <- inla(formula, family="gaussian", data=mjspr)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+The class precision looks too high. Need to change the default prior
+
+# Informative Gamma priors on the precisions
+
+Now try more informative gamma priors for the precisions. Define it so
+the mean value of gamma prior is set to the inverse of the variance of
+the residuals of the fixed-effects only model. We expect the error
+variances to be lower than this variance so this is an overestimate.
+The variance of the gamma prior (for the precision) is controlled by
+the `apar` parameter.
+
+```{r}
+apar <- 0.5
+lmod <- lm(score ~ subject*gender+craven*subject+social,mjspr)
+bpar <- apar*var(residuals(lmod))
+lgprior <- list(prec = list(prior="loggamma", param = c(apar,bpar)))
+formula = score ~ subject*gender+craven*subject+social+f(school, model="iid", hyper = lgprior)+f(classch, model="iid", hyper = lgprior)+f(classchid, model="iid", hyper = lgprior)
+result <- inla(formula, family="gaussian", data=mjspr)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the transforms to an SD scale for the field and error. Make a table of summary statistics for the posteriors:
+
+```{r sumstats}
+sigmaschool <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[2]])
+sigmaclass <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[3]])
+sigmaid <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[4]])
+sigmaepsilon <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[1]])
+restab=sapply(result$marginals.fixed, function(x) inla.zmarginal(x,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaschool,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaclass,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaid,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaepsilon,silent=TRUE))
+colnames(restab) = c(names(lmod$coef),"school","class","id","epsilon")
+data.frame(restab)
+```
+
+Also construct a plot of the SD posteriors:
+
+```{r plotsds}
+ddf <- data.frame(rbind(sigmaschool,sigmaclass,sigmaid,sigmaepsilon),errterm=gl(4,1024,labels = c("school","class","id","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("score")+ylab("density")+xlim(0,0.15)
+```
+
+Posteriors look OK. More variation is assigned to the school and class than previous models.
+
+# Penalized Complexity Prior
+
+In [Simpson et al (2015)](http://arxiv.org/abs/1403.4630v3), penalized complexity priors are proposed. This
+requires that we specify a scaling for the SDs of the random effects. We use the SD of the residuals
+of the fixed effects only model (what might be called the base model in the paper) to provide this scaling.
+
+```{r}
+lmod <- lm(score ~ subject*gender+craven*subject+social,mjspr)
+sdres <- sd(residuals(lmod))
+pcprior <- list(prec = list(prior="pc.prec", param = c(3*sdres,0.01)))
+formula = score ~ subject*gender+craven*subject+social+f(school, model="iid", hyper = pcprior)+f(classch, model="iid", hyper = pcprior)+f(classchid, model="iid", hyper = pcprior)
+result <- inla(formula, family="gaussian", data=mjspr)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the summaries as before:
+
+```{r ref.label="sumstats"}
+```
+
+Make the plots:
+
+```{r ref.label="plotsds"}
+```
+
+Class variation is quite small compared to the other sources.
+
+# Package version info
+
+```{r}
+sessionInfo()
+```

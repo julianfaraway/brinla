@@ -1,0 +1,133 @@
+---
+title: INLA analysis of a repeated measures model
+author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+ html_document:
+  toc: true
+  theme: cosmo
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+options(digits=5,show.signif.stars=FALSE,width=120)
+```
+
+See the [introduction](index.html) for an overview. Also see [other analyses](../mixchange/repeated.html) of this data.
+See the textbook for a full discussion. See a [STAN analysis](../stan/repeated.html) of the same data.
+
+Load the libraries:
+
+```{r}
+library(ggplot2)
+library(INLA)
+```
+
+# Data
+
+Load in and summarize the data:
+
+
+```{r}
+data(vision, package="faraway")
+vision$npower <- rep(1:4,14)
+vision$eyesub <- paste0(vision$eye,vision$subject)
+summary(vision)
+```
+
+Plot the data:
+
+```{r}
+ggplot(vision, aes(y=acuity, x=npower, linetype=eye))+geom_line()+facet_wrap(~ subject)
+```
+
+
+# Default prior model
+
+
+```{r}
+formula <- acuity ~ power + f(subject, model="iid") + f(eyesub, model="iid")
+result <- inla(formula, family="gaussian", data=vision)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+The subject precision looks far too high. Need to change the default prior
+
+# Informative Gamma priors on the precisions
+
+Now try more informative gamma priors for the precisions. Define it so
+the mean value of gamma prior is set to the inverse of the variance of
+the residuals of the fixed-effects only model. We expect the error
+variances to be lower than this variance so this is an overestimate.
+The variance of the gamma prior (for the precision) is controlled by
+the `cpar` parameter in the code.
+
+```{r}
+apar <- 0.5
+lmod <- lm(acuity ~ power, vision)
+bpar <- apar*var(residuals(lmod))
+lgprior <- list(prec = list(prior="loggamma", param = c(apar,bpar)))
+formula = acuity ~ power+f(subject, model="iid", hyper = lgprior)+f(eyesub, model="iid", hyper = lgprior)
+result <- inla(formula, family="gaussian", data=vision)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the transforms to an SD scale for the random effect terms. Make a table of summary statistics for the posteriors:
+
+```{r sumstats}
+sigmasubject <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[2]])
+sigmaeye <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[3]])
+sigmaepsilon <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[1]])
+restab=sapply(result$marginals.fixed, function(x) inla.zmarginal(x,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmasubject,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaeye,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaepsilon,silent=TRUE))
+colnames(restab) = c(names(lmod$coef),"subject","eyesub","epsilon")
+data.frame(restab)
+```
+
+Also construct a plot the SD posteriors:
+
+```{r plotsds}
+ddf <- data.frame(rbind(sigmasubject,sigmaeye,sigmaepsilon),errterm=gl(3,1024,labels = c("subject","eye","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("acuity")+ylab("density")+xlim(0,15)
+```
+
+Posteriors look OK.
+
+# Penalized Complexity Prior
+
+In [Simpson et al (2015)](http://arxiv.org/abs/1403.4630v3), penalized complexity priors are proposed. This
+requires that we specify a scaling for the SDs of the random effects. We use the SD of the residuals
+of the fixed effects only model (what might be called the base model in the paper) to provide this scaling.
+
+```{r}
+lmod <- lm(acuity ~ power, vision)
+sdres <- sd(residuals(lmod))
+pcprior <- list(prec = list(prior="pc.prec", param = c(3*sdres,0.01)))
+formula = acuity ~ power+f(subject, model="iid", hyper = pcprior)+f(eyesub, model="iid", hyper = pcprior)
+result <- inla(formula, family="gaussian", data=vision)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the summaries as before:
+
+```{r ref.label="sumstats"}
+```
+
+Make the plots:
+
+```{r ref.label="plotsds"}
+```
+
+Posteriors have some weight near zero.
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
+

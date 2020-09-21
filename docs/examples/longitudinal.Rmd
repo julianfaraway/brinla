@@ -1,0 +1,82 @@
+---
+title: INLA analysis of a longitudinal model
+author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+ html_document:
+  toc: true
+  theme: cosmo
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
+options(digits=5,show.signif.stars=FALSE,width=120)
+```
+
+See the [introduction](index.html) for an overview. Also see [other analyses](../mixchange/multilevel.html) of this data.
+See the textbook for a full discussion.
+
+Load the libraries:
+
+```{r}
+library(ggplot2)
+library(INLA)
+library(dplyr)
+```
+
+# Data
+
+Load in and plot the data:
+
+```{r}
+data(psid, package="faraway")
+head(psid)
+summary(psid)
+psid$cyear <- psid$year-78
+psid20 <- filter(psid, person <= 20)
+ggplot(psid20, aes(x=year, y=income))+geom_line()+facet_wrap(~ person)
+ggplot(psid20, aes(x=year, y=income+100, group=person)) +geom_line()+facet_wrap(~ sex)+scale_y_log10()
+```
+
+
+# Default prior model
+
+
+```{r}
+psid$slperson <- psid$person
+formula <- log(income) ~ cyear*sex+age+educ + f(person, model="iid") + f(slperson, cyear , model="iid")
+result <- inla(formula, family="gaussian", data=psid)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Seems like the default priors might be adequate.
+Compute the transforms to an SD scale for the random effect terms. Make a table of summary statistics for the posteriors:
+
+```{r sumstats}
+sigmaint <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[2]])
+sigmaslope <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[3]])
+sigmaepsilon <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[1]])
+restab=sapply(result$marginals.fixed, function(x) inla.zmarginal(x,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaint,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaslope,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaepsilon,silent=TRUE))
+mm <- model.matrix(~ cyear*sex+age+educ,psid)
+colnames(restab) = c(colnames(mm),"intSD","slopeSD","epsilon")
+data.frame(restab)
+```
+
+Also construct a plot the SD posteriors:
+
+```{r plotsds}
+ddf <- data.frame(rbind(sigmaint,sigmaslope,sigmaepsilon),errterm=gl(3,1024,labels = c("slope","intercept","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("log(income)")+ylab("density")
+```
+
+Posteriors look OK. Slope SD is on a different scale so not so comparable.
+
+# Session Info
+
+```{r}
+sessionInfo()
+```

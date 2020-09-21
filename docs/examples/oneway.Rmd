@@ -1,0 +1,179 @@
+---
+title: INLA for One Way Anova with a random effect
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: github_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
+options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
+knitr::knit_hooks$set(setPch = function(before, options, envir) {
+  if(before) par(pch = 20)
+})
+opts_chunk$set(setPch = TRUE)
+```
+
+See the [introduction](index.md) for an overview. 
+Load the libraries:
+
+```{r}
+library(ggplot2)
+library(INLA)
+```
+
+# Data
+
+Load up and look at the data:
+
+```{r pulp}
+data(pulp, package="faraway")
+summary(pulp)
+ggplot(pulp, aes(x=operator, y=bright))+geom_point(position = position_jitter(width=0.1, height=0.0))
+```
+
+# Default fit
+
+Run the default INLA model:
+
+```{r}
+formula <- bright ~ f(operator, model="iid")
+result <- inla(formula, family="gaussian", data=pulp)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Precision for the operator term is unreasonably high. This is due to the diffuse gamma prior on the precisions. Problems are seen with other packages also. We can improve the calculation but result would remain implausible so it is better
+we change the prior.
+
+# Informative but weak prior on the SDs
+
+Try a truncated normal prior with low precision instead. A precision of 0.01 corresponds to an SD of 10. This
+is substantially larger than the SD of the response so the information supplied is very weak.
+
+```{r}
+tnprior <- list(prec = list(prior="logtnormal", param = c(0,0.01)))
+formula <- bright ~ f(operator, model="iid", hyper = tnprior)
+result <- inla(formula, family="gaussian", data=pulp)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+The results appear more plausible. Transform to the SD scale. Make a table of summary statistics for the posteriors:
+
+```{r sumstats}
+sigmaalpha <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[2]])
+sigmaepsilon <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[1]])
+restab <- sapply(result$marginals.fixed, function(x) inla.zmarginal(x,silent=TRUE))
+restab <- cbind(restab, inla.zmarginal(sigmaalpha,silent=TRUE))
+restab <- cbind(restab, inla.zmarginal(sigmaepsilon,silent = TRUE))
+restab <- cbind(restab, sapply(result$marginals.random$operator,function(x) inla.zmarginal(x, silent = TRUE)))
+colnames(restab)  <-  c("mu","alpha","epsilon",levels(pulp$operator))
+data.frame(restab)
+```
+
+The results are now comparable to previous fits to this data using likelihood and MCMC-based methods. Plot the posterior densities for the two SD terms:
+
+```{r plotsds}
+ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,dim(sigmaalpha)[1],labels = c("alpha","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("bright")+ylab("density")+xlim(0,2)
+```
+
+We see that the operator SD less precisely known than the error SD.
+
+We can compute the probability that the operator SD is smaller than 0.1:
+
+```{r}
+inla.pmarginal(0.1, sigmaalpha)
+```
+
+The probability is small but not negligible.
+
+
+# Informative gamma priors on the precisions
+
+Now try more informative gamma priors for the precisions. Define it so the mean value of gamma prior is set to the inverse of the
+variance of the response. We expect the two error variances to be lower than the response variance so this is an overestimate.
+The variance of the gamma prior (for the precision) is controlled by the `apar` shape parameter in the code. `apar=1` is the
+exponential distribution. Shape values less than one result in densities that have a mode at zero and decrease monotonely. These
+have greater variance and hence less informative.
+
+```{r}
+apar <- 0.5
+bpar <- var(pulp$bright)*apar
+lgprior <- list(prec = list(prior="loggamma", param = c(apar,bpar)))
+formula <- bright ~ f(operator, model="iid", hyper = lgprior)
+result <- inla(formula, family="gaussian", data=pulp)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the summaries as before:
+
+```{r ref.label="sumstats"}
+```
+
+Make the plots:
+
+```{r pulpgamma, ref.label="plotsds"}
+```
+
+The posterior for the error SD is quite similar to that seen previously but the operator SD is larger and
+bounded away from zero.
+
+We can compute the probability that the operator SD is smaller than 0.1:
+
+```{r}
+inla.pmarginal(0.1, sigmaalpha)
+```
+
+The probability is very small. The choice of prior may be unsuitable in that no density is placed on
+an SD=0 (or infinite precision). We also have very little prior weight on low SD/high precision values. This
+leads to a posterior for the operator with very little density assigned to small values of the SD. But we
+can see from looking at the data or from prior analyses of the data that there is some possibility that the
+operator SD is negligibly small.
+
+
+# Penalized Complexity Prior
+
+In [Simpson et al (2015)](http://arxiv.org/abs/1403.4630v3), penalized complexity priors are proposed. This
+requires that we specify a scaling for the SDs of the random effects. We use the SD of the residuals
+of the fixed effects only model (what might be called the base model in the paper) to provide this scaling.
+
+```{r}
+sdres <- sd(pulp$bright)
+pcprior <- list(prec = list(prior="pc.prec", param = c(3*sdres,0.01)))
+formula <- bright ~ f(operator, model="iid", hyper = pcprior)
+result <- inla(formula, family="gaussian", data=pulp)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the summaries as before:
+
+```{r ref.label="sumstats"}
+```
+
+Make the plots:
+
+```{r pulppc, ref.label="plotsds"}
+```
+
+We get a similar result to the truncated normal prior used earlier although the operator SD is generally smaller.
+
+We can compute the probability that the operator SD is smaller than 0.1:
+
+```{r}
+inla.pmarginal(0.1, sigmaalpha)
+```
+
+The probability is small but not insubstantial.
+
+# Package version info
+
+```{r}
+sessionInfo()
+```

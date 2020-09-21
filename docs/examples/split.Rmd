@@ -1,0 +1,138 @@
+---
+title: INLA Split Plot Model example
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: github_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
+options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
+knitr::knit_hooks$set(setPch = function(before, options, envir) {
+  if(before) par(pch = 20)
+})
+opts_chunk$set(setPch = TRUE)
+```
+
+See the [introduction](index.md) for an overview. 
+Load the libraries:
+
+```{r}
+library(ggplot2)
+library(INLA)
+```
+
+# Data
+
+Load in and plot the data:
+
+```{r irri}
+data(irrigation, package="faraway")
+summary(irrigation)
+ggplot(irrigation, aes(y=yield, x=field, shape=variety, color=irrigation)) + geom_point()
+```
+
+# Default INLA fit
+
+```{r}
+formula <- yield ~ irrigation + variety +f(field, model="iid")
+result <- inla(formula, family="gaussian", data=irrigation)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Default looks more plausible than [one way](oneway.html) and [RBD](rbd.html) examples.
+
+Compute the transforms to an SD scale for the field and error. Make a table of summary statistics for the posteriors:
+
+```{r sumstats}
+sigmaalpha <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[2]])
+sigmaepsilon <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[1]])
+restab=sapply(result$marginals.fixed, function(x) inla.zmarginal(x,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaalpha,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaepsilon,silent=TRUE))
+colnames(restab) = c("mu","ir2","ir3","ir4","v2","alpha","epsilon")
+data.frame(restab)
+```
+
+Also construct a plot the SD posteriors:
+
+```{r plotsds}
+ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),labels = c("alpha","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,10)
+```
+
+Posteriors look OK.
+
+# Informative Gamma priors on the precisions
+
+Now try more informative gamma priors for the precisions. Define it so
+the mean value of gamma prior is set to the inverse of the variance of
+the residuals of the fixed-effects only model. We expect the two error
+variances to be lower than this variance so this is an overestimate.
+The variance of the gamma prior (for the precision) is controlled by
+the `apar` shape parameter.
+
+```{r}
+apar <- 0.5
+lmod <- lm(yield ~ irrigation+variety, data=irrigation)
+bpar <- apar*var(residuals(lmod))
+lgprior <- list(prec = list(prior="loggamma", param = c(apar,bpar)))
+formula = yield ~ irrigation+variety+f(field, model="iid", hyper = lgprior)
+result <- inla(formula, family="gaussian", data=irrigation)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the summaries as before:
+
+```{r ref.label="sumstats"}
+```
+
+Make the plots:
+
+```{r irrigam, ref.label="plotsds"}
+```
+
+Posteriors look OK.
+
+# Penalized Complexity Prior
+
+In [Simpson et al (2015)](http://arxiv.org/abs/1403.4630v3), penalized complexity priors are proposed. This
+requires that we specify a scaling for the SDs of the random effects. We use the SD of the residuals
+of the fixed effects only model (what might be called the base model in the paper) to provide this scaling.
+
+```{r}
+lmod <- lm(yield ~ irrigation+variety, irrigation)
+sdres <- sd(residuals(lmod))
+pcprior <- list(prec = list(prior="pc.prec", param = c(3*sdres,0.01)))
+formula <- yield ~ irrigation+variety+f(field, model="iid", hyper = pcprior)
+result <- inla(formula, family="gaussian", data=irrigation)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the summaries as before:
+
+```{r ref.label="sumstats"}
+```
+
+Make the plots:
+
+```{r irripc, ref.label="plotsds"}
+```
+
+Posteriors look OK.
+
+
+
+# Package version info
+
+```{r}
+sessionInfo()
+```
+
+

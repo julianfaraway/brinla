@@ -1,0 +1,134 @@
+---
+title:  INLA analysis of a nested model
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: github_document
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
+options(digits=5,show.signif.stars=FALSE,width=120)
+knit_hooks$set(optipng = hook_optipng)
+knit_hooks$set(pngquant = hook_pngquant)
+knitr::knit_hooks$set(setPch = function(before, options, envir) {
+  if(before) par(pch = 20)
+})
+opts_chunk$set(setPch = TRUE)
+```
+
+See the [introduction](index.md) for an overview. 
+Load the libraries:
+
+```{r}
+library(ggplot2)
+library(INLA)
+```
+
+# Data
+
+Load in and plot the data:
+```{r eggs}
+data(eggs, package="faraway")
+summary(eggs)
+ggplot(eggs, aes(y=Fat, x=Lab, color=Technician, shape=Sample)) + geom_point(position = position_jitter(width=0.1, height=0.0))
+```
+
+# Default prior model
+
+Need to construct unique labels for
+nested factor levels. Don't really care which technician and sample is
+which otherwise would take more care with the labeling.
+
+```{r}
+eggs$labtech <- factor(paste0(eggs$Lab,eggs$Technician))
+eggs$labtechsamp <- factor(paste0(eggs$Lab,eggs$Technician,eggs$Sample))
+```
+
+```{r}
+formula <- Fat ~ 1 + f(Lab, model="iid") + f(labtech, model="iid") + f(labtechsamp, model="iid")
+result <- inla(formula, family="gaussian", data=eggs)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+The lab and sample precisions look far too high. Need to change the default prior
+
+# Informative Gamma priors on the precisions
+
+Now try more informative gamma priors for the precisions. Define it so
+the mean value of gamma prior is set to the inverse of the variance of
+the residuals of the fixed-effects only model. We expect the error
+variances to be lower than this variance so this is an overestimate.
+The variance of the gamma prior (for the precision) is controlled by
+the `apar` shape parameter in the code.
+
+```{r}
+apar <- 0.5
+bpar <- apar*var(eggs$Fat)
+lgprior <- list(prec = list(prior="loggamma", param = c(apar,bpar)))
+formula = Fat ~ 1+f(Lab, model="iid", hyper = lgprior)+f(labtech, model="iid", hyper = lgprior)+f(labtechsamp, model="iid", hyper = lgprior)
+result <- inla(formula, family="gaussian", data=eggs)
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the transforms to an SD scale for the field and error. Make a table of summary statistics for the posteriors:
+
+```{r sumstats}
+sigmaLab <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[2]])
+sigmaTech <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[3]])
+sigmaSample <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[4]])
+sigmaepsilon <- inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[1]])
+restab=sapply(result$marginals.fixed, function(x) inla.zmarginal(x,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaLab,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaTech,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaSample,silent=TRUE))
+restab=cbind(restab, inla.zmarginal(sigmaepsilon,silent=TRUE))
+colnames(restab) = c("mu","Lab","Technician","Sample","epsilon")
+data.frame(restab)
+```
+
+Also construct a plot the SD posteriors:
+
+```{r plotsds}
+ddf <- data.frame(rbind(sigmaLab,sigmaTech,sigmaSample,sigmaepsilon),errterm=gl(4,nrow(sigmaLab),labels = c("Lab","Tech","Samp","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("Fat")+ylab("density")+xlim(0,0.25)
+```
+
+Posteriors look OK.
+
+# Penalized Complexity Prior
+
+In [Simpson et al (2015)](http://arxiv.org/abs/1403.4630v3), penalized complexity priors are proposed. This
+requires that we specify a scaling for the SDs of the random effects. We use the SD of the residuals
+of the fixed effects only model (what might be called the base model in the paper) to provide this scaling.
+
+```{r}
+sdres <- sd(eggs$Fat)
+pcprior <- list(prec = list(prior="pc.prec", param = c(3*sdres,0.01)))
+formula = Fat ~ 1+f(Lab, model="iid", hyper = pcprior)+f(labtech, model="iid", hyper = pcprior)+f(labtechsamp,model="iid", hyper = pcprior)
+result <- inla(formula, family="gaussian", data=eggs, control.family=list(hyper=pcprior))
+result <- inla.hyperpar(result)
+summary(result)
+```
+
+Compute the summaries as before:
+
+```{r ref.label="sumstats"}
+```
+
+Make the plots:
+
+```{r eggspc, ref.label="plotsds"}
+```
+
+Posteriors look OK.
+
+
+# Package version info
+
+```{r}
+sessionInfo()
+```
+
