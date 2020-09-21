@@ -1,6 +1,6 @@
 ---
 title: "Simple example with INLA"
-author: Julian Faraway
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output: github_document
 ---

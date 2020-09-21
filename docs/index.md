@@ -2,6 +2,13 @@
 
 A book by [Xiaofeng Wang](https://filer.case.edu/xxw17/), [Ryan Yue](http://zicklin.baruch.cuny.edu/faculty/profiles/yu-ryan-yue) and [Julian Faraway](http://people.bath.ac.uk/jjf23/)
 
+INLA stands for Integrated Nested Laplace Approximations. It is used for fitting 
+[Latent Gaussian models](https://tgmstat.wordpress.com/2013/10/16/latent-gaussian-models-inla/) (LGM). 
+LGMs include a wide range of commonly
+used regression models. Unlike MCMC which uses simulation methods, INLA
+uses approximation methods for Bayesian model fitting. Within the class
+of LGMs, INLA can fit models much faster than MCMC-based methods.
+
 ## Chapter scripts
 
 1. Introduction: [intro.R](scripts/intro.R) 
@@ -22,6 +29,15 @@ A book by [Xiaofeng Wang](https://filer.case.edu/xxw17/), [Ryan Yue](http://zick
 The [brinla](https://github.com/julianfaraway/brinla) R package contains data and functions
 to support the book.
 
+Visit the  [INLA](http://www.r-inla.org) website to learn much more including
+[how to install the INLA R package](http://www.r-inla.org/download).
+
+Install the `brinla` package with:
+
+```
+devtools::install_github("julianfaraway/brinla")
+```
+
 ## Errata
 
 Here are the [errata](errata.md). If you find any other errata, please let us know according to the chapter: Ch3, 4, 6, 10 (Xiaofeng Wang),
@@ -29,7 +45,7 @@ Ch2, 7 or 9 (Ryan Yue) or Ch1, 5 or 8 (Julian Faraway).
 
 ## Examples
 
-Here are some [preview examples](http://people.bath.ac.uk/jjf23/brinla/)
+Here are some [examples](examples/index.md)
 
 ## Purchase
 

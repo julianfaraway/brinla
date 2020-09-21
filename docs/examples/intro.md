@@ -1,6 +1,6 @@
 Simple example with INLA
 ================
-Julian Faraway
+[Julian Faraway](https://julianfaraway.github.io/)
 21 September 2020
 
 See the [introduction](index.md) for general information. We need the
