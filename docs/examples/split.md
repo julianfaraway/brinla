@@ -1,7 +1,7 @@
 INLA Split Plot Model example
 ================
 [Julian Faraway](https://julianfaraway.github.io/)
-21 September 2020
+22 September 2020
 
 See the [introduction](index.md) for an overview. Load the libraries:
 
@@ -50,7 +50,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = irrigation)" 
 Time used:
-    Pre = 1.24, Running = 0.139, Post = 0.0751, Total = 1.45 
+    Pre = 1.31, Running = 0.14, Post = 0.0759, Total = 1.53 
 Fixed effects:
                mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 (Intercept)  38.469 2.810     32.829   38.461     44.151 38.452   0
@@ -108,7 +108,7 @@ ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),l
 ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,10)
 ```
 
-![](figs/plotsds-1.png)<!-- -->
+![](figs/plotsdsirri-1.png)<!-- -->
 
 Posteriors look OK.
 
@@ -137,7 +137,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = irrigation)" 
 Time used:
-    Pre = 1.22, Running = 0.138, Post = 0.0738, Total = 1.43 
+    Pre = 1.25, Running = 0.142, Post = 0.0751, Total = 1.47 
 Fixed effects:
                mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 (Intercept)  38.491 3.440     31.569   38.477     45.489 38.462   0
@@ -186,13 +186,6 @@ quant0.975 45.469   10.65  10.258  13.688   1.9576 9.2349  1.9532
 
 Make the plots:
 
-``` r
-ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),labels = c("alpha","epsilon")))
-ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,10)
-```
-
-![](figs/irrigam-1.png)<!-- -->
-
 Posteriors look OK.
 
 # Penalized Complexity Prior
@@ -218,7 +211,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = irrigation)" 
 Time used:
-    Pre = 1.25, Running = 0.135, Post = 0.0734, Total = 1.46 
+    Pre = 1.32, Running = 0.138, Post = 0.0758, Total = 1.53 
 Fixed effects:
                mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 (Intercept)  38.477 3.042     32.361   38.469     44.639 38.457   0
@@ -266,13 +259,6 @@ quant0.975 44.617  9.5218  9.1274  12.579   1.9608 7.3651  1.9816
 ```
 
 Make the plots:
-
-``` r
-ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),labels = c("alpha","epsilon")))
-ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,10)
-```
-
-![](figs/irripc-1.png)<!-- -->
 
 Posteriors look OK.
 

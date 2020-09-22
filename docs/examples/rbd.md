@@ -1,7 +1,7 @@
 INLA analysis of block design - one fixed and one random effect
 ================
 [Julian Faraway](https://julianfaraway.github.io/)
-21 September 2020
+22 September 2020
 
 See the [introduction](index.md) for an overview. Load the libraries:
 
@@ -58,7 +58,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = penicillin)" 
 Time used:
-    Pre = 1.16, Running = 0.183, Post = 0.0755, Total = 1.41 
+    Pre = 1.19, Running = 0.191, Post = 0.081, Total = 1.46 
 Fixed effects:
               mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 (Intercept) 84.048 2.447     79.198   84.045     88.905 84.040   0
@@ -102,7 +102,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = penicillin)" 
 Time used:
-    Pre = 1.15, Running = 0.162, Post = 0.0747, Total = 1.39 
+    Pre = 1.21, Running = 0.164, Post = 0.0772, Total = 1.45 
 Fixed effects:
               mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 (Intercept) 84.030 2.772     78.505   84.029     89.553 84.028   0
@@ -157,7 +157,7 @@ ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),l
 ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,15)
 ```
 
-![](figs/plotsds-1.png)<!-- -->
+![](figs/plotsdspeni-1.png)<!-- -->
 
 Posterior for the blend SD is more diffuse than the error SD. Posterior
 for the blend SD has non-zero density at zero.
@@ -187,7 +187,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = penicillin)" 
 Time used:
-    Pre = 1.3, Running = 0.14, Post = 0.0743, Total = 1.52 
+    Pre = 1.19, Running = 0.142, Post = 0.0762, Total = 1.4 
 Fixed effects:
               mean    sd 0.025quant 0.5quant 0.975quant   mode   kld
 (Intercept) 84.030 3.037     77.986   84.029     90.080 84.027 0.001
@@ -236,13 +236,6 @@ quant0.975 90.058   6.3768   10.359  7.3723 10.175  6.2517  11.022   3.2473   4.
 
 Make the plots:
 
-``` r
-ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),labels = c("alpha","epsilon")))
-ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,15)
-```
-
-![](figs/penigam-1.png)<!-- -->
-
 Posterior for blend SD has no weight near zero.
 
 # Penalized Complexity Prior
@@ -268,7 +261,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = penicillin)" 
 Time used:
-    Pre = 1.19, Running = 0.172, Post = 0.0782, Total = 1.44 
+    Pre = 1.19, Running = 0.173, Post = 0.077, Total = 1.44 
 Fixed effects:
               mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 (Intercept) 84.032 2.638     78.788   84.030     89.272 84.028   0
@@ -316,13 +309,6 @@ quant0.975 89.259   6.5438   10.524  7.5389  7.9169  6.6505    9.651   2.4311   
 ```
 
 Make the plots:
-
-``` r
-ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),labels = c("alpha","epsilon")))
-ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,15)
-```
-
-![](figs/penipc-1.png)<!-- -->
 
 Posterior for blend SD has some weight near zero. Results are comparable
 to previous analyses.

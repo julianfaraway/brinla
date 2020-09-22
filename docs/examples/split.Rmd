@@ -60,7 +60,7 @@ data.frame(restab)
 
 Also construct a plot the SD posteriors:
 
-```{r plotsds}
+```{r plotsdsirri}
 ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),labels = c("alpha","epsilon")))
 ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,10)
 ```

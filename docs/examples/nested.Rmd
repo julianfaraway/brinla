@@ -91,7 +91,7 @@ data.frame(restab)
 
 Also construct a plot the SD posteriors:
 
-```{r plotsds}
+```{r plotsdseggs}
 ddf <- data.frame(rbind(sigmaLab,sigmaTech,sigmaSample,sigmaepsilon),errterm=gl(4,nrow(sigmaLab),labels = c("Lab","Tech","Samp","epsilon")))
 ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("Fat")+ylab("density")+xlim(0,0.25)
 ```

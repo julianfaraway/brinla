@@ -77,7 +77,7 @@ data.frame(restab)
 
 The results are now comparable to previous fits to this data using likelihood and MCMC-based methods. Plot the posterior densities for the two SD terms:
 
-```{r plotsds}
+```{r plotsdspulp}
 ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,dim(sigmaalpha)[1],labels = c("alpha","epsilon")))
 ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("bright")+ylab("density")+xlim(0,2)
 ```

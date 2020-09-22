@@ -1,7 +1,7 @@
 INLA analysis of a nested model
 ================
 [Julian Faraway](https://julianfaraway.github.io/)
-21 September 2020
+22 September 2020
 
 See the [introduction](index.md) for an overview. Load the libraries:
 
@@ -58,7 +58,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = eggs)" 
 Time used:
-    Pre = 1.53, Running = 8.74, Post = 0.316, Total = 10.6 
+    Pre = 1.58, Running = 8.69, Post = 0.326, Total = 10.6 
 Fixed effects:
              mean    sd 0.025quant 0.5quant 0.975quant  mode kld
 (Intercept) 0.387 0.035      0.319    0.387      0.456 0.387   0
@@ -109,7 +109,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = eggs)" 
 Time used:
-    Pre = 1.47, Running = 6, Post = 0.231, Total = 7.7 
+    Pre = 1.59, Running = 6.11, Post = 0.237, Total = 7.93 
 Fixed effects:
              mean    sd 0.025quant 0.5quant 0.975quant  mode kld
 (Intercept) 0.387 0.061      0.264    0.387      0.511 0.388   0
@@ -168,7 +168,7 @@ ddf <- data.frame(rbind(sigmaLab,sigmaTech,sigmaSample,sigmaepsilon),errterm=gl(
 ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("Fat")+ylab("density")+xlim(0,0.25)
 ```
 
-![](figs/plotsds-1.png)<!-- -->
+![](figs/plotsdseggs-1.png)<!-- -->
 
 Posteriors look OK.
 
@@ -194,7 +194,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = eggs, control.family = list(hyper = pcprior))" 
 Time used:
-    Pre = 1.5, Running = 162, Post = 1.14, Total = 165 
+    Pre = 1.53, Running = 160, Post = 1.08, Total = 163 
 Fixed effects:
              mean    sd 0.025quant 0.5quant 0.975quant  mode kld
 (Intercept) 0.387 0.051      0.285    0.387       0.49 0.387   0
@@ -246,13 +246,6 @@ quant0.975   0.4901   0.18599    0.17031   0.11761  0.11895
 ```
 
 Make the plots:
-
-``` r
-ddf <- data.frame(rbind(sigmaLab,sigmaTech,sigmaSample,sigmaepsilon),errterm=gl(4,nrow(sigmaLab),labels = c("Lab","Tech","Samp","epsilon")))
-ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("Fat")+ylab("density")+xlim(0,0.25)
-```
-
-![](figs/eggspc-1.png)<!-- -->
 
 Posteriors look OK.
 
