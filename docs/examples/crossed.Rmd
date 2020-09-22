@@ -1,5 +1,5 @@
 ---
-title: INLA analysis of Latin Square design - one fixed and two crossed random effects
+title: "INLA analysis of Latin Square design - one fixed and two crossed random effects"
 author: "[Julian Faraway](https://julianfaraway.github.io/)"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output: github_document

@@ -50,7 +50,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = irrigation)" 
 Time used:
-    Pre = 1.31, Running = 0.14, Post = 0.0759, Total = 1.53 
+    Pre = 1.34, Running = 0.141, Post = 0.0792, Total = 1.56 
 Fixed effects:
                mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 (Intercept)  38.469 2.810     32.829   38.461     44.151 38.452   0
@@ -137,7 +137,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = irrigation)" 
 Time used:
-    Pre = 1.25, Running = 0.142, Post = 0.0751, Total = 1.47 
+    Pre = 1.32, Running = 0.153, Post = 0.0842, Total = 1.56 
 Fixed effects:
                mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 (Intercept)  38.491 3.440     31.569   38.477     45.489 38.462   0
@@ -186,6 +186,13 @@ quant0.975 45.469   10.65  10.258  13.688   1.9576 9.2349  1.9532
 
 Make the plots:
 
+``` r
+ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),labels = c("alpha","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,10)
+```
+
+![](figs/irrigam-1.png)<!-- -->
+
 Posteriors look OK.
 
 # Penalized Complexity Prior
@@ -211,7 +218,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = irrigation)" 
 Time used:
-    Pre = 1.32, Running = 0.138, Post = 0.0758, Total = 1.53 
+    Pre = 1.32, Running = 0.145, Post = 0.0828, Total = 1.55 
 Fixed effects:
                mean    sd 0.025quant 0.5quant 0.975quant   mode kld
 (Intercept)  38.477 3.042     32.361   38.469     44.639 38.457   0
@@ -259,6 +266,13 @@ quant0.975 44.617  9.5218  9.1274  12.579   1.9608 7.3651  1.9816
 ```
 
 Make the plots:
+
+``` r
+ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,nrow(sigmaalpha),labels = c("alpha","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("yield")+ylab("density")+xlim(0,10)
+```
+
+![](figs/irripc-1.png)<!-- -->
 
 Posteriors look OK.
 

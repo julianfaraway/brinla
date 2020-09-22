@@ -58,7 +58,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = abrasion)" 
 Time used:
-    Pre = 1.48, Running = 8.24, Post = 0.448, Total = 10.2 
+    Pre = 1.44, Running = 8.07, Post = 0.441, Total = 9.95 
 Fixed effects:
                mean     sd 0.025quant 0.5quant 0.975quant    mode kld
 (Intercept) 260.937  7.149    246.059  261.177    274.424 261.608   0
@@ -111,7 +111,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = abrasion)" 
 Time used:
-    Pre = 1.47, Running = 1.48, Post = 0.154, Total = 3.1 
+    Pre = 1.43, Running = 1.44, Post = 0.149, Total = 3.02 
 Fixed effects:
                mean     sd 0.025quant 0.5quant 0.975quant    mode kld
 (Intercept) 264.406 10.223    243.794  264.424    284.959 264.481   0
@@ -196,7 +196,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = abrasion)" 
 Time used:
-    Pre = 1.58, Running = 18.4, Post = 1.44, Total = 21.4 
+    Pre = 1.54, Running = 17.4, Post = 1.3, Total = 20.2 
 Fixed effects:
                mean    sd 0.025quant 0.5quant 0.975quant    mode   kld
 (Intercept) 264.435 8.748    246.663  264.475    282.025 264.571 0.000

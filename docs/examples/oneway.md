@@ -51,7 +51,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = pulp)" 
 Time used:
-    Pre = 0.963, Running = 0.134, Post = 0.075, Total = 1.17 
+    Pre = 0.976, Running = 0.134, Post = 0.0733, Total = 1.18 
 Fixed effects:
             mean    sd 0.025quant 0.5quant 0.975quant mode kld
 (Intercept) 60.4 0.093     60.216     60.4     60.584 60.4   0
@@ -95,7 +95,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = pulp)" 
 Time used:
-    Pre = 0.951, Running = 0.146, Post = 0.0743, Total = 1.17 
+    Pre = 1.01, Running = 0.146, Post = 0.0748, Total = 1.23 
 Fixed effects:
             mean   sd 0.025quant 0.5quant 0.975quant mode   kld
 (Intercept) 60.4 0.41     59.612     60.4     61.188 60.4 0.022
@@ -189,7 +189,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = pulp)" 
 Time used:
-    Pre = 0.963, Running = 0.13, Post = 0.0738, Total = 1.17 
+    Pre = 0.949, Running = 0.131, Post = 0.0766, Total = 1.16 
 Fixed effects:
             mean    sd 0.025quant 0.5quant 0.975quant mode   kld
 (Intercept) 60.4 0.233     59.931     60.4     60.869 60.4 0.002
@@ -235,6 +235,13 @@ quant0.975  60.868 0.92011  0.45204  0.35291  0.19263  0.69904  0.75429
 
 Make the plots:
 
+``` r
+ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,dim(sigmaalpha)[1],labels = c("alpha","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("bright")+ylab("density")+xlim(0,2)
+```
+
+![](figs/pulpgamma-1.png)<!-- -->
+
 The posterior for the error SD is quite similar to that seen previously
 but the operator SD is larger and bounded away from zero.
 
@@ -276,7 +283,7 @@ summary(result)
 Call:
    "inla(formula = formula, family = \"gaussian\", data = pulp)" 
 Time used:
-    Pre = 0.95, Running = 0.155, Post = 0.0984, Total = 1.2 
+    Pre = 0.949, Running = 0.152, Post = 0.0778, Total = 1.18 
 Fixed effects:
             mean    sd 0.025quant 0.5quant 0.975quant mode kld
 (Intercept) 60.4 0.173     60.049     60.4     60.752 60.4   0
@@ -321,6 +328,13 @@ quant0.975   60.75  0.66253 0.47167   0.24942   0.11059  0.57213  0.62442
 ```
 
 Make the plots:
+
+``` r
+ddf <- data.frame(rbind(sigmaalpha,sigmaepsilon),errterm=gl(2,dim(sigmaalpha)[1],labels = c("alpha","epsilon")))
+ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("bright")+ylab("density")+xlim(0,2)
+```
+
+![](figs/pulppc-1.png)<!-- -->
 
 We get a similar result to the truncated normal prior used earlier
 although the operator SD is generally smaller.

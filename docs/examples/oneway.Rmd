@@ -7,9 +7,8 @@ output: github_document
 
 ```{r global_options, include=FALSE}
 library(knitr)
-opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, optipng='-o7', pngquant='--speed=1 --quality=0-50')
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, pngquant='--speed=1 --quality=0-50')
 options(digits=5,show.signif.stars=FALSE,width=120)
-knit_hooks$set(optipng = hook_optipng)
 knit_hooks$set(pngquant = hook_pngquant)
 knitr::knit_hooks$set(setPch = function(before, options, envir) {
   if(before) par(pch = 20)
@@ -118,7 +117,7 @@ Compute the summaries as before:
 
 Make the plots:
 
-```{r pulpgamma, ref.label="plotsds"}
+```{r pulpgamma, ref.label="plotsdspulp"}
 ```
 
 The posterior for the error SD is quite similar to that seen previously but the operator SD is larger and
@@ -159,7 +158,7 @@ Compute the summaries as before:
 
 Make the plots:
 
-```{r pulppc, ref.label="plotsds"}
+```{r pulppc, ref.label="plotsdspulp"}
 ```
 
 We get a similar result to the truncated normal prior used earlier although the operator SD is generally smaller.
