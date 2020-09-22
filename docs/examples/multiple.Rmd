@@ -1,20 +1,19 @@
 ---
 title: INLA analysis of a Multiple Response Multilevel  model
-author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-output:
- html_document:
-  toc: true
-  theme: cosmo
+output: github_document
 ---
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
-options(digits=5,show.signif.stars=FALSE,width=96)
+library(knitr)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, dev ="svglite")
+options(digits=5,show.signif.stars=FALSE,width=120)
+knitr::knit_hooks$set(setPch = function(before, options, envir) {
+  if(before) par(pch = 20)
+})
+opts_chunk$set(setPch = TRUE)
 ```
-
-See the [introduction](index.html) for an overview. Also see [other analyses](../mixchange/multiple.html) of this data.
-See the textbook for a full discussion. See a [STAN analysis](../stan/multiple.html) of the same data.
 
 Load the libraries:
 
@@ -36,7 +35,7 @@ mjspr$craven <- mjspr$raven-mean(mjspr$raven)
 ```
 
 Plot the data
-```{r}
+```{r mjsp}
 ggplot(mjspr, aes(x=raven, y=score))+geom_jitter(alpha=0.25)+facet_grid(gender ~ subject)
 ```
 
@@ -100,8 +99,8 @@ data.frame(restab)
 
 Also construct a plot of the SD posteriors:
 
-```{r plotsds}
-ddf <- data.frame(rbind(sigmaschool,sigmaclass,sigmaid,sigmaepsilon),errterm=gl(4,1024,labels = c("school","class","id","epsilon")))
+```{r plotsdsmjsp}
+ddf <- data.frame(rbind(sigmaschool,sigmaclass,sigmaid,sigmaepsilon),errterm=gl(4,nrow(sigmaepsilon),labels = c("school","class","id","epsilon")))
 ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("score")+ylab("density")+xlim(0,0.15)
 ```
 
@@ -130,7 +129,7 @@ Compute the summaries as before:
 
 Make the plots:
 
-```{r ref.label="plotsds"}
+```{r mjsppc, ref.label="plotsdsmjsp"}
 ```
 
 Class variation is quite small compared to the other sources.

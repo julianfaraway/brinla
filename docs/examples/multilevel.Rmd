@@ -1,20 +1,21 @@
 ---
 title: INLA analysis of a multilevel model
-author: "[Julian Faraway](http://people.bath.ac.uk/jjf23/)"
+author: "[Julian Faraway](https://julianfaraway.github.io/)"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-output:
- html_document:
-  toc: true
-  theme: cosmo
+output: github_document
 ---
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(cache=FALSE,comment=NA, fig.path="/tmp/Figs/", warning=FALSE, message=FALSE)
-options(digits=5,show.signif.stars=FALSE,width=96)
+library(knitr)
+opts_chunk$set(cache=FALSE,comment=NA, fig.path="figs/", warning=FALSE, message=FALSE, dev ="svglite")
+options(digits=5,show.signif.stars=FALSE,width=120)
+knitr::knit_hooks$set(setPch = function(before, options, envir) {
+  if(before) par(pch = 20)
+})
+opts_chunk$set(setPch = TRUE)
 ```
 
-See the [introduction](index.html) for an overview. Also see [other analyses](../mixchange/multilevel.html) of this data.
-See the textbook for a full discussion.
+See the [introduction](index.md) for an overview. 
 
 Load the libraries:
 
@@ -27,7 +28,7 @@ library(INLA)
 
 Load in and plot the data. We centre the Raven score and create unique labels for the classes within schools:
 
-```{r}
+```{r jsp}
 data(jsp, package="faraway")
 jspr <- jsp[jsp$year==2,]
 jspr$craven <- jspr$raven-mean(jspr$raven)
@@ -85,8 +86,8 @@ data.frame(restab)
 
 Also construct a plot of the SD posteriors:
 
-```{r plotsds}
-ddf <- data.frame(rbind(sigmaschool,sigmaclass,sigmaepsilon),errterm=gl(3,1024,labels = c("school","class","epsilon")))
+```{r plotsdsjsp}
+ddf <- data.frame(rbind(sigmaschool,sigmaclass,sigmaepsilon),errterm=gl(3,nrow(sigmaclass),labels = c("school","class","epsilon")))
 ggplot(ddf, aes(x,y, linetype=errterm))+geom_line()+xlab("math")+ylab("density")+xlim(0,7)
 ```
 
@@ -115,7 +116,7 @@ Compute the summaries as before:
 
 Make the plots:
 
-```{r ref.label="plotsds"}
+```{r jsppc, ref.label="plotsdsjsp"}
 ```
 
 Posteriors look OK.
