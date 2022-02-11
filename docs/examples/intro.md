@@ -1,7 +1,7 @@
 Simple example with INLA
 ================
 [Julian Faraway](https://julianfaraway.github.io/)
-21 September 2020
+11 February 2022
 
 See the [introduction](index.md) for general information. We need the
 following packages (which you must install first).
@@ -12,15 +12,15 @@ library(INLA)
 
     Loading required package: Matrix
 
-    Loading required package: sp
+    Loading required package: foreach
 
     Loading required package: parallel
 
-    Loading required package: foreach
+    Loading required package: sp
 
-    This is INLA_20.03.17 built 2020-09-21 11:41:39 UTC.
-    See www.r-inla.org/contact-us for how to get help.
-    To enable PARDISO sparse library; see inla.pardiso()
+    This is INLA_22.01.25 built 2022-01-25 17:43:11 UTC.
+     - See www.r-inla.org/contact-us for how to get help.
+     - To enable PARDISO sparse library; see inla.pardiso()
 
 ``` r
 library(brinla)
@@ -38,14 +38,12 @@ data:
 plot(y ~ x, xlab="Distance(Mpc)", ylab="Velocity(km/s)", data=hubble)
 ```
 
-![](figs/hub1-1.png)<!-- -->
+![](figs/hub1-1.svg)<!-- -->
 
-The velocity *y* is related to the distance *x* by \[
-y = \beta x
-\]
+The velocity *y* is related to the distance *x* by *y=βx*
 
-where \(\beta\) is *Hubble’s constant*. The age of universe is
-approximated by the inverse of Hubble’s constant.
+where β is *Hubble’s constant*. The age of universe is approximated by
+the inverse of Hubble’s constant.
 
 # Least squares
 
@@ -56,10 +54,8 @@ lmod <- lm(y~x-1, data=hubble)
 coef(lmod)
 ```
 
-``` 
-     x 
-76.581 
-```
+         x 
+    76.581 
 
 We have 60 seconds, 60 minutes, 24 hours and 365.25 days in a year and
 one megaparsec (Mpc) is 3.09e19 km. Here is a function to transform
@@ -71,10 +67,8 @@ hubtoage <- function(x) 3.09e19/(x*60^2*24*365.25*1e9)
 hubtoage(coef(lmod))
 ```
 
-``` 
-     x 
-12.786 
-```
+         x 
+    12.786 
 
 Our estimate is 12.79 billion years. We can form a 95% confidence
 interval for Hubble’s constant.
@@ -83,10 +77,8 @@ interval for Hubble’s constant.
 (bci <- confint(lmod))
 ```
 
-``` 
-   2.5 % 97.5 %
-x 68.379 84.783
-```
+       2.5 % 97.5 %
+    x 68.379 84.783
 
 We can transform this into a 95% confidence interval for the age of the
 universe in billions of years:
@@ -95,10 +87,8 @@ universe in billions of years:
 hubtoage(bci)
 ```
 
-``` 
-  2.5 % 97.5 %
-x 14.32 11.549
-```
+      2.5 % 97.5 %
+    x 14.32 11.549
 
 The upper and lower bound come out in the reverse order because of the
 inversion of Hubble’s constant.
@@ -112,10 +102,8 @@ imod <- inla(y ~ x -1, family="gaussian", data=hubble)
 imod$summary.fixed
 ```
 
-``` 
-   mean     sd 0.025quant 0.5quant 0.975quant   mode        kld
-x 75.43 3.9146     67.508   75.485     83.017 75.572 2.6405e-08
-```
+        mean     sd 0.025quant 0.5quant 0.975quant   mode        kld
+    x 75.375 3.9976     67.362   75.414     83.166 75.493 5.4991e-05
 
 The resulting posterior mean is different from the linear model estimate
 of beta. Since we are using a different method, we should not expect it
@@ -129,7 +117,7 @@ inla.set.control.fixed.default()[c('mean','prec')]
 
     $mean
     [1] 0
-    
+
     $prec
     [1] 0.001
 
@@ -157,13 +145,11 @@ imod <- inla(y ~ x -1, family="gaussian", control.fixed=list(prec=1e-9), data=hu
 (ibci <- imod$summary.fixed)
 ```
 
-``` 
-    mean     sd 0.025quant 0.5quant 0.975quant   mode        kld
-x 76.581 4.2478     68.122   76.581     85.034 76.581 6.4301e-06
-```
+        mean     sd 0.025quant 0.5quant 0.975quant   mode        kld
+    x 76.581 4.1854     68.284   76.581     84.868 76.581 5.4812e-05
 
 We get a posterior mean which is the same as the least squares estimate.
-The 95% credibility interval is \[68.1, 85\] which is comparable but
+The 95% credibility interval is \[68.3, 84.9\] which is comparable but
 also a bit different from the 95% confidence interval. Quite apart from
 the numerical differences, the two intervals are conceptually different.
 
@@ -177,7 +163,7 @@ plot(imod$marginals.fixed$x, type = "l", xlab = "beta", ylab = "density",
 abline(v = ibci[c(3, 5)], lty = 2)
 ```
 
-![](figs/hubpost-1.png)<!-- -->
+![](figs/hubpost-1.svg)<!-- -->
 
 We can convert to statements about the age of the universe in terms of
 billions of years:
@@ -186,10 +172,8 @@ billions of years:
 hubtoage(ibci[c(1,3,4,5,6)])
 ```
 
-``` 
-    mean 0.025quant 0.5quant 0.975quant   mode
-x 12.786     14.374   12.786     11.515 12.786
-```
+        mean 0.025quant 0.5quant 0.975quant   mode
+    x 12.786     14.339   12.786     11.537 12.786
 
 This can also be plotted:
 
@@ -199,6 +183,6 @@ plot(ageden, type = "l", xlab = "Age in billions of years", ylab = "density")
 abline(v = hubtoage(ibci[c(3, 5)]), lty = 2)
 ```
 
-![](figs/hubci-1.png)<!-- -->
+![](figs/hubci-1.svg)<!-- -->
 
-The 95% credible interval is \[11.51, 14.37\] billion years.
+The 95% credible interval is \[11.54, 14.34\] billion years.

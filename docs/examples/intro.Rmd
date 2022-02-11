@@ -2,11 +2,12 @@
 title: "Simple example with INLA"
 author: "[Julian Faraway](https://julianfaraway.github.io/)"
 date: "`r format(Sys.time(), '%d %B %Y')`"
-output: github_document
+output: 
+  github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,comment=NA, warning=FALSE, fig.path="figs/")
+knitr::opts_chunk$set(echo = TRUE,comment=NA, warning=FALSE, fig.path="figs/",dev = 'svglite')
 ```
 
 See the [introduction](index.md) for general information. We need the following packages
@@ -29,12 +30,9 @@ Load and plot the data:
 plot(y ~ x, xlab="Distance(Mpc)", ylab="Velocity(km/s)", data=hubble)
 ```
 
-The velocity *y* is related to the distance *x* by
-$$
-y = \beta x
-$$
+The velocity *y* is related to the distance *x* by *y=βx*
 
-where $\beta$ is *Hubble's constant*. The age of universe is
+where β is *Hubble's constant*. The age of universe is
 approximated by the inverse of Hubble's constant.
 
 # Least squares
