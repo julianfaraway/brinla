@@ -1,7 +1,26 @@
-
-# Quick Start
+#' ---
+#' title: "Bayesian Regression Modeling with INLA"
+#' author: "Chapter One: Introduction"
+#' output:
+#'   github_document
+#' ---
+#+ echo=FALSE
+knitr::opts_chunk$set(comment=NA, 
+                      echo = TRUE,
+                      fig.path="figs/", 
+                      dev = 'svglite',  
+                      fig.ext = ".svg",
+                      warning=FALSE, 
+                      message=FALSE)
+library(svglite)
+ggplot2::theme_set(ggplot2::theme_bw())
+par(mgp=c(1.5,0.5,0), mar=c(3.1,3.1,3.1,0), pch=20)
+#' Code from [Bayesian Regression Modeling with INLA](http://julianfaraway.github.io/brinla/)
+#' 
+#' # Quick Start
 
 data(hubble, package = "brinla")
+#+hubble
 plot(y ~ x, xlab = "Distance(Mpc)", ylab = "Velocity(km/s)", data = hubble)
 lmod <- lm(y ~ x - 1, data = hubble)
 coef(lmod)
@@ -13,11 +32,13 @@ library(INLA)
 imod <- inla(y ~ x - 1, family = "gaussian", control.fixed = list(prec = 1e-09), 
     data = hubble)
 (ibci <- imod$summary.fixed)
+#+ hubmarginals
 plot(imod$marginals.fixed$x, type = "l", xlab = "beta", ylab = "density", 
     xlim = c(60, 100))
 abline(v = ibci[c(3, 5)], lty = 2)
 hubtoage(ibci[c(1, 3, 4, 5, 6)])
 ageden <- inla.tmarginal(hubtoage, imod$marginals.fixed$x)
+#+ hubage
 plot(ageden, type = "l", xlab = "Age in billions of years", ylab = "density")
 abline(v = hubtoage(ibci[c(3, 5)]), lty = 2)
 hubtoage(c(10, 15, 20))
@@ -31,21 +52,5 @@ imod <- inla(y ~ x - 1, family = "gaussian", control.fixed = list(mean = uhub,
 (ibci <- imod$summary.fixed)
 hubtoage(ibci[c(1, 3, 4, 5, 6)])
 
-# Bayes Theory
-
-
-# Prior and Posterior Distributions
-
-
-# Model Checking
-
-
-# Model Selection
-
-
-# Hypothesis Testing
-
-
-# Bayesian Computation
-
+#' # Version information
 sessionInfo()

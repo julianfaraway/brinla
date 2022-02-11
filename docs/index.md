@@ -11,7 +11,7 @@ of LGMs, INLA can fit models much faster than MCMC-based methods.
 
 ## Chapter scripts
 
-1. Introduction: [intro.R](scripts/intro.R) 
+1. Introduction: [intro.R](scripts/intro.R) with [output](scripts/intro.md)
 2. Theory of INLA: [inla.R](scripts/inla.R)
 3. Linear Regression: [blr.R](scripts/blr.R)
 4. Generalized Linear Models: [glm.R](scripts/glm.R)
