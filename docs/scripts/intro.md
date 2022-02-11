@@ -18,6 +18,8 @@ plot(y ~ x, xlab = "Distance(Mpc)", ylab = "Velocity(km/s)", data = hubble)
 
 ![](figs/hubble-1..svg)<!-- -->
 
+Use standard linear model
+
 ``` r
 lmod <- lm(y ~ x - 1, data = hubble)
 coef(lmod)
@@ -50,13 +52,21 @@ hubtoage(bci)
 
 ``` r
 library(INLA)
+```
+
+Use a weakly informative prior
+
+``` r
 imod <- inla(y ~ x - 1, family = "gaussian", control.fixed = list(prec = 1e-09), 
     data = hubble)
 (ibci <- imod$summary.fixed)
 ```
 
-        mean     sd 0.025quant 0.5quant 0.975quant   mode       kld
-    x 76.581 4.0627     68.538   76.581     84.617 76.581 5.206e-05
+        mean     sd 0.025quant 0.5quant 0.975quant   mode        kld
+    x 76.581 4.0934     68.479   76.581     84.675 76.581 3.9344e-05
+
+The mean and mode are similar to the published text output but the sd
+and interval have increased
 
 ``` r
 plot(imod$marginals.fixed$x, type = "l", xlab = "beta", ylab = "density", 
@@ -71,7 +81,7 @@ hubtoage(ibci[c(1, 3, 4, 5, 6)])
 ```
 
         mean 0.025quant 0.5quant 0.975quant   mode
-    x 12.786     14.287   12.786     11.572 12.786
+    x 12.786     14.299   12.786     11.564 12.786
 
 ``` r
 ageden <- inla.tmarginal(hubtoage, imod$marginals.fixed$x)
@@ -83,6 +93,8 @@ abline(v = hubtoage(ibci[c(3, 5)]), lty = 2)
 ```
 
 ![](figs/hubage-1..svg)<!-- -->
+
+Use a more informative prior
 
 ``` r
 hubtoage(c(10, 15, 20))
@@ -96,15 +108,20 @@ imod <- inla(y ~ x - 1, family = "gaussian", control.fixed = list(mean = 65,
 (ibci <- imod$summary.fixed)
 ```
 
-        mean    sd 0.025quant 0.5quant 0.975quant   mode        kld
-    x 75.102 4.316     66.407   75.156     83.489 75.262 5.5568e-06
+        mean     sd 0.025quant 0.5quant 0.975quant  mode        kld
+    x 75.496 3.6938     68.108   75.529     82.693 75.59 3.7208e-05
+
+The mean and mode are similar to the published text output but the sd
+and interval have increased
 
 ``` r
 hubtoage(ibci[c(1, 3, 4, 5, 6)])
 ```
 
-        mean 0.025quant 0.5quant 0.975quant  mode
-    x 13.038     14.745   13.028     11.728 13.01
+       mean 0.025quant 0.5quant 0.975quant   mode
+    x 12.97     14.377   12.964     11.841 12.954
+
+Use the Ussher prior which is very wrong
 
 ``` r
 (uhub <- hubtoage((2016 + 4004 - 1)/1e+09))
@@ -118,15 +135,15 @@ imod <- inla(y ~ x - 1, family = "gaussian", control.fixed = list(mean = uhub,
 (ibci <- imod$summary.fixed)
 ```
 
-        mean     sd 0.025quant 0.5quant 0.975quant   mode       kld
-    x 76.581 7.3864     62.074   76.581     91.082 76.581 1.666e-05
+        mean     sd 0.025quant 0.5quant 0.975quant   mode        kld
+    x 76.581 4.1743     68.316   76.581     84.841 76.581 8.7379e-05
 
 ``` r
 hubtoage(ibci[c(1, 3, 4, 5, 6)])
 ```
 
         mean 0.025quant 0.5quant 0.975quant   mode
-    x 12.786     15.774   12.786      10.75 12.786
+    x 12.786     14.333   12.786     11.541 12.786
 
 # Version information
 
