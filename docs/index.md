@@ -15,7 +15,7 @@ of LGMs, INLA can fit models much faster than MCMC-based methods.
 2. Theory of INLA: [inla.R](scripts/inla.R)
 3. Linear Regression: [blr.R](scripts/blr.R)
 4. Generalized Linear Models: [glm.R](scripts/glm.R)
-5. Generalized Linear Mixed Models [glmm.R](scripts/glmm.R) 
+5. Generalized Linear Mixed Models [glmm.R](scripts/glmm.R) with [output](scripts/glmm.md)
 6. Survival Analysis: [surv.R](scripts/surv.R)
 7. Random Walk Models for Smoothing: [npr.R](scripts/npr.R)
 8. Gaussian Process Regression [gpr.R](scripts/gpr.R) 
