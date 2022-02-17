@@ -226,8 +226,9 @@ bri.smoothband <- function(x, y, nbasis=25, degree=2, alpha=2, xout=x,
   sigma02 <- exp(mres$summary.log.variance.nominal['0.5quant'])[,]
   tau0 <- 1 / (4 * kappa0^3 * sigma02)^0.5
   spde <- inla.spde2.matern(mesh, alpha=alpha, constr = FALSE,
-                            B.tau = cbind(log(tau0)),
-                            B.kappa = cbind(log(kappa0)))
+                            prior.tau = tau0,
+                            prior.kappa = kappa0,
+                            theta.prior.prec = 1e5)
   formula <- y ~ -1 + f(sinc, model=spde)
   resulta <- inla(formula, data=data,  family="normal",
                   control.predictor= list(A=inla.stack.A(sestpred),compute=TRUE))
@@ -235,8 +236,9 @@ bri.smoothband <- function(x, y, nbasis=25, degree=2, alpha=2, xout=x,
   sigma02 <- exp(mres$summary.log.variance.nominal['0.5quant'])[,]
   tau0 <- 1 / (4 * kappa0^3 * sigma02)^0.5
   spde <- inla.spde2.matern(mesh, alpha=alpha, constr = FALSE,
-                            B.tau = cbind(log(tau0)),
-                            B.kappa = cbind(log(kappa0)))
+                            prior.tau = tau0,
+                            prior.kappa = kappa0,
+                            theta.prior.prec = 1e5)
   formula <- y ~ -1 + f(sinc, model=spde)
   resultb <- inla(formula, data=data,  family="normal",
                   control.predictor= list(A=inla.stack.A(sestpred),compute=TRUE))

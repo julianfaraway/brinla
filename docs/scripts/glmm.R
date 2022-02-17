@@ -183,7 +183,6 @@ imodq <- inla(formula, family="gaussian", data=nreading,
               control.predictor = list(compute=TRUE),
               control.compute=list(return.marginals.predictor=TRUE))
 qm90 <- imodq$marginals.fitted.values[[270]]
-# error here
 #+readingden
 p1+geom_line(data=data.frame(qm90),aes(x,y),linetype=2)+
    xlab("PIAT")+ylab("density")

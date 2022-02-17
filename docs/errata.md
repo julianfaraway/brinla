@@ -22,4 +22,15 @@ to compute and are not always needed.
 - p139: Section 5.7.1 should be ignored. This correction is not available in the current version of 
 INLA because it is not regarded as sufficiently stable to be relied upon.
 
+- p218: The specification for `inla.spde2.matern` has changed arguments requiring
+
+```
+spde <- inla.spde2.matern(mesh, alpha=alpha, constr = FALSE,
+  prior.tau = tau0,
+  prior.kappa = kappa0,
+  theta.prior.prec = 1e5)
+```
+
+The value of `theta.prior.prec` is intentionally large to ensure prior is respected.
+
 - p273: should be 340 cases, not visits.
