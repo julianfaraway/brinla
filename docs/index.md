@@ -30,7 +30,7 @@ The [brinla](https://github.com/julianfaraway/brinla) R package contains data an
 to support the book.
 
 Visit the  [INLA](http://www.r-inla.org) website to learn much more including
-[how to install the INLA R package](http://www.r-inla.org/download).
+[how to install the INLA R package](https://www.r-inla.org/download-install).
 
 Install the `brinla` package with:
 
