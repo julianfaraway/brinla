@@ -2,7 +2,7 @@ Confidence bands for smoothness with Gaussian process regression using
 INLA
 ================
 [Julian Faraway](https://julianfaraway.github.io/)
-21 September 2020
+21 February 2022
 
 See the [introduction](index.md) for more about INLA. See an example of
 [Gaussian process regression](gpreg.html) using the same data. The
@@ -126,34 +126,34 @@ I have also have a paper, (Faraway 2016) on the topic.
 sessionInfo()
 ```
 
-    R version 4.0.2 (2020-06-22)
+    R version 4.1.0 (2021-05-18)
     Platform: x86_64-apple-darwin17.0 (64-bit)
-    Running under: macOS Catalina 10.15.6
-    
+    Running under: macOS Big Sur 10.16
+
     Matrix products: default
-    BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
-    LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
-    
+    BLAS:   /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRblas.dylib
+    LAPACK: /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRlapack.dylib
+
     locale:
     [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
-    
+
     attached base packages:
     [1] parallel  stats     graphics  grDevices utils     datasets  methods   base     
-    
+
     other attached packages:
-    [1] brinla_0.1.0  INLA_20.03.17 foreach_1.5.0 sp_1.4-2      Matrix_1.2-18 knitr_1.29   
-    
+    [1] brinla_0.1.0  INLA_22.01.25 sp_1.4-6      foreach_1.5.2 Matrix_1.4-0  knitr_1.37   
+
     loaded via a namespace (and not attached):
-     [1] codetools_0.2-16     lattice_0.20-41      digest_0.6.25        grid_4.0.2           MatrixModels_0.4-1  
-     [6] magrittr_1.5         evaluate_0.14        rlang_0.4.7          stringi_1.4.6        rmarkdown_2.3       
-    [11] splines_4.0.2        iterators_1.0.12     tools_4.0.2          stringr_1.4.0        Deriv_4.0.1         
-    [16] xfun_0.16            yaml_2.2.1           compiler_4.0.2       htmltools_0.5.0.9000
+     [1] rstudioapi_0.13    magrittr_2.0.2     splines_4.1.0      lattice_0.20-45    Deriv_4.1.3        rlang_1.0.1       
+     [7] fastmap_1.1.0      stringr_1.4.0      highr_0.9          tools_4.1.0        grid_4.1.0         xfun_0.29         
+    [13] cli_3.1.1          htmltools_0.5.2    iterators_1.0.14   MatrixModels_0.5-0 yaml_2.2.2         digest_0.6.29     
+    [19] codetools_0.2-18   evaluate_0.14      rmarkdown_2.11     stringi_1.7.6      compiler_4.1.0    
 
 # References
 
-<div id="refs" class="references">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-<div id="ref-bral:gsa:97">
+<div id="ref-bral:gsa:97" class="csl-entry">
 
 Bralower, T. J., P. D. Fullagar, C. K. Paull, G. S. Dwyer, and R. M.
 Leckie. 1997. “Mid-Cretaceous Strontium-Isotope Stratigraphy of Deep-Sea
@@ -161,7 +161,7 @@ Sections.” *Geological Society of America Bulletin* 109: 1421–42.
 
 </div>
 
-<div id="ref-chaud:jasa:99">
+<div id="ref-chaud:jasa:99" class="csl-entry">
 
 Chaudhuri, Probal, and J. S. Marron. 1999. “SiZer for Exploration of
 Structures in Curves.” *Journal of the American Statistical Association*
@@ -169,7 +169,7 @@ Structures in Curves.” *Journal of the American Statistical Association*
 
 </div>
 
-<div id="ref-STA4:STA4100">
+<div id="ref-STA4:STA4100" class="csl-entry">
 
 Faraway, Julian. 2016. “Confidence Bands for Smoothness in Nonparametric
 Regression.” *Stat* 5 (1): 4–10. <http://dx.doi.org/10.1002/sta4.100>.

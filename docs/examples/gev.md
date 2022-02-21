@@ -1,7 +1,7 @@
 Extreme values using INLA
 ================
 [Julian Faraway](https://julianfaraway.github.io/)
-21 September 2020
+21 February 2022
 
 See the [introduction](index.md) for more about INLA. Load in the
 packages:
@@ -38,19 +38,18 @@ Some scaling is necessary to get the model to fit. Generalized extreme
 value distributions are notoriously difficult to fit. It is not unusual
 to see failures to fit which require some tinkering to rectify. The
 current implementation is marked as experimental so you may experience
-some difficulties with the fit. We will need the `control.compute =
-list(config=TRUE)` in the computations later in this example.
+some difficulties with the fit. We will need the
+`control.compute = list(config=TRUE)` in the computations later in this
+example.
 
 ``` r
 imod <- inla(Flow ~ 1 + year, data = calder, family = "gev", scale = 0.1, control.compute = list(config=TRUE))
 imod$summary.fixed
 ```
 
-``` 
-                mean      sd 0.025quant 0.5quant 0.975quant     mode        kld
-(Intercept) 36.70809 5.84433    25.1725 36.69416     48.279 36.64147 6.5922e-05
-year         0.75959 0.24709     0.2637  0.76249      1.241  0.76952 1.1209e-05
-```
+                    mean      sd 0.025quant 0.5quant 0.975quant     mode        kld
+    (Intercept) 36.60812 5.85907   25.18367 36.54763    48.3342 36.40377 5.7647e-05
+    year         0.76643 0.25438    0.27329  0.76397     1.2793  0.76394 2.1949e-05
 
 We can see that there is positive linear trend term indicating the peak
 flows for this river are increasing over time. We can plot the fixed
@@ -70,7 +69,7 @@ slope is negative is:
 inla.pmarginal(0, imod$marginals.fixed$year)
 ```
 
-    [1] 0.0020089
+    [1] 0.0019367
 
 Rather small.
 
@@ -135,7 +134,7 @@ So probability of exceeding the observed value is:
 1-pless
 ```
 
-    [1] 0.0088652
+    [1] 0.0088729
 
 Hydrologists often work with the expected time for the event to occur
 called the *recurrence interval*. In this case, the value is:
@@ -144,7 +143,7 @@ called the *recurrence interval*. In this case, the value is:
 1/(1-pless)
 ```
 
-    [1] 112.8
+    [1] 112.7
 
 Now set year to 2017:
 
@@ -159,15 +158,15 @@ pless = pgev(maxflow, xi, tau, eta,sigma)
 1/(1-pless)
 ```
 
-    [1] 71.818
+    [1] 71.433
 
 We see that the recurrence interval substantially reduced.
 
 # Credibility interval
 
 Can compute a 95% credibility interval. Need to sample from the full
-posterior. This is where we need the `control.compute =
-list(config=TRUE)` option.
+posterior. This is where we need the
+`control.compute = list(config=TRUE)` option.
 
 ``` r
 nsamp = 999
@@ -215,10 +214,8 @@ From this we can compute the credibility interval:
 quantile(retp, c(0.025, 0.5, 0.975))
 ```
 
-``` 
-    2.5%      50%    97.5% 
-  53.629  246.841 1490.882 
-```
+        2.5%      50%    97.5% 
+      48.393  248.126 2074.246 
 
 This is quite wide. If we want a denser grid for the hyperparameters, we
 can redo INLA with a smaller step size for the grid. We will get denser
@@ -231,27 +228,29 @@ bad as it seems because these are the integration points.
 sessionInfo()
 ```
 
-    R version 4.0.2 (2020-06-22)
+    R version 4.1.0 (2021-05-18)
     Platform: x86_64-apple-darwin17.0 (64-bit)
-    Running under: macOS Catalina 10.15.6
-    
+    Running under: macOS Big Sur 10.16
+
     Matrix products: default
-    BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
-    LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
-    
+    BLAS:   /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRblas.dylib
+    LAPACK: /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRlapack.dylib
+
     locale:
     [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
-    
+
     attached base packages:
     [1] parallel  stats     graphics  grDevices utils     datasets  methods   base     
-    
+
     other attached packages:
-    [1] brinla_0.1.0  INLA_20.03.17 foreach_1.5.0 sp_1.4-2      Matrix_1.2-18 knitr_1.29   
-    
+    [1] brinla_0.1.0  INLA_22.01.25 sp_1.4-6      foreach_1.5.2 Matrix_1.4-0  knitr_1.37   
+
     loaded via a namespace (and not attached):
-     [1] codetools_0.2-16     lattice_0.20-41      digest_0.6.25        grid_4.0.2           MatrixModels_0.4-1  
-     [6] magrittr_1.5         evaluate_0.14        rlang_0.4.7          stringi_1.4.6        rmarkdown_2.3       
-    [11] splines_4.0.2        iterators_1.0.12     tools_4.0.2          stringr_1.4.0        Deriv_4.0.1         
-    [16] xfun_0.16            yaml_2.2.1           compiler_4.0.2       htmltools_0.5.0.9000
+     [1] rstudioapi_0.13     magrittr_2.0.2      splines_4.1.0       mnormt_2.0.2        lattice_0.20-45    
+     [6] Deriv_4.1.3         rlang_1.0.1         fastmap_1.1.0       stringr_1.4.0       highr_0.9          
+    [11] tools_4.1.0         grid_4.1.0          tmvnsim_1.0-2       xfun_0.29           cli_3.1.1          
+    [16] htmltools_0.5.2     iterators_1.0.14    MatrixModels_0.5-0  yaml_2.2.2          digest_0.6.29      
+    [21] numDeriv_2016.8-1.1 codetools_0.2-18    evaluate_0.14       sn_2.0.1            rmarkdown_2.11     
+    [26] stringi_1.7.6       compiler_4.1.0      stats4_4.1.0       
 
 # References

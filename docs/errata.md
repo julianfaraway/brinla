@@ -33,4 +33,9 @@ spde <- inla.spde2.matern(mesh, alpha=alpha, constr = FALSE,
 
 The value of `theta.prior.prec` is intentionally large to ensure prior is respected.
 
+- p233:
+
+We must add the option `control.compute=list(return.marginals.predictor=TRUE)` to get
+the marginal distributions needed for the subsequent calculation.
+
 - p273: should be 340 cases, not visits.
