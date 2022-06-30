@@ -9,19 +9,19 @@ used regression models. Unlike MCMC which uses simulation methods, INLA
 uses approximation methods for Bayesian model fitting. Within the class
 of LGMs, INLA can fit models much faster than MCMC-based methods.
 
-## Chapter scripts
+## Chapters
 
-1. Introduction: [intro.R](scripts/intro.R) with [output](scripts/intro.md)
+1. Introduction: [intro.R](scripts/intro.R) with [output](scripts/intro.md) and [text online](https://julianfaraway.github.io/brinlabook/)
 2. Theory of INLA: [inla.R](scripts/inla.R)
 3. Linear Regression: [blr.R](scripts/blr.R)
 4. Generalized Linear Models: [glm.R](scripts/glm.R)
-5. Generalized Linear Mixed Models [glmm.R](scripts/glmm.R) with [output](scripts/glmm.md)
+5. Generalized Linear Mixed Models [glmm.R](scripts/glmm.R) with [output](scripts/glmm.md) and [text online](https://julianfaraway.github.io/brinlabook/chaglmm.html)
 6. Survival Analysis: [surv.R](scripts/surv.R)
 7. Random Walk Models for Smoothing: [npr.R](scripts/npr.R)
 8. Gaussian Process Regression [gpr.R](scripts/gpr.R) with [output](scripts/gpr.md)
-9. Generalized Additive Models: [gam.R](scripts/gam.R)
+9. Generalized Additive Models: [gam.R](scripts/gam.R) and [text online](https://julianfaraway.github.io/brinlabook/chagpr.html)
 10. Errors-in-Variables Regression: [eiv.R](scripts/eiv.R)
-11. Miscellaneous Topics: [misc.R](scripts/misc.R)
+11. Miscellaneous Topics: [misc.R](scripts/misc.R) and [extreme values text online](https://julianfaraway.github.io/brinlabook/chamisc.html#sec:extreval)
 
 
 ## R package

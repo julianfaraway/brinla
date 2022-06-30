@@ -94,7 +94,7 @@ imod$summary.fixed
 inla.pmarginal(0, imod$marginals.fixed$year)
 library(brinla)
 plot(bri.hyper.sd(imod$marginals.hyperpar$`precision for GEV observations`), type="l", xlab="SD", ylab="density")
-plot(imod$marginals.hyperpar$`shape-parameter for gev observations`,type="l", xlim=c(-0.2,0.5), xlab="xi", ylab="density")
+plot(imod$marginals.hyperpar$`tail parameter for GEV observations`,type="l", xlim=c(-0.2,0.5), xlab="xi", ylab="density")
 pgev <- function(y,xi,tau,eta,sigma=1){
   exp(-(1+xi*sqrt(tau*sigma)*(y-eta))^(-1/xi))
 }
