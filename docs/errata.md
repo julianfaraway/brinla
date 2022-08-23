@@ -19,6 +19,10 @@ As it happens, this makes no important difference to the numerical outcome.
 - p118: Both `inla()` calls on this page now also require the option `control.compute=list(return.marginals.predictor=TRUE)` because these quantities are expensive
 to compute and are not always needed.
 
+- p134: Last para. Difference between predictions and table is due to the difference between subject specific effects and population effects
+
+- p137: Third para. Difference can be explained (see errata for p134) but the analysis is still worthwhile.
+
 - p139: Section 5.7.1 should be ignored. This correction is not available in the current version of 
 INLA because it is not regarded as sufficiently stable to be relied upon.
 

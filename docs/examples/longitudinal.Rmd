@@ -40,7 +40,6 @@ ggplot(psid20, aes(x=year, y=income))+geom_line()+facet_wrap(~ person)
 ggplot(psid20, aes(x=year, y=income+100, group=person)) +geom_line()+facet_wrap(~ sex)+scale_y_log10()
 ```
 
-
 # Default prior model
 
 
