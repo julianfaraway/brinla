@@ -8,60 +8,68 @@
 #'
 #' @return an object for the 'model' option used in inla()
 #' @export
-bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt", "spde")){
+bri.adapt.prior <- function(x, degree=3, nknot=5, theta.prec=0.01, type=c("indpt", "spde", "stat")){
+  # xx <- sort(unique(x))
   require('splines')
   x.mesh = inla.mesh.1d(x)
-  x.ind = inla.mesh.1d.bary(x.mesh,x,"nearest")$index[,1] 
+  x.ind = inla.mesh.1d.bary(x.mesh,x,"nearest")$index[,1]
   
   n <- x.mesh$n
   xx <- x.mesh$loc
   x.fem = inla.mesh.1d.fem(x.mesh)
-  H = -x.fem$g1; 
+  H = -x.fem$g1;
   H[1,] = 0; H[n,] = 0; ## Free boundaries.
-  G2 = Matrix::t(H)%*%Diagonal(n, 1/Matrix::diag(x.fem$c0))%*%H
+  G2 = t(H)%*%Diagonal(n, 1/diag(x.fem$c0))%*%H
   
   epsi <- 1e-8
   M0 <- Diagonal(n, epsi)
   M1 <- Diagonal(n, 0)
   M2 <- G2
   
+  
   if(type=='indpt'){
-    ##B-spline basis 
-    prob <- seq(0, 1,, nknot)[2:(nknot-1)]
+    ##B-spline basis
+    prob <- seq(0, 1,length.out=nknot)[2:(nknot-1)]
     xk <- as.vector(quantile(x, prob=prob)) ## Knots
     basis <- bs(xx, knots=xk, degree=degree, intercept=T)
     
     ## mean and precision for theta
     theta.mu <- rep(0, dim(basis)[2])
-    theta.Q <- Matrix::diag(rep(theta.prec, dim(basis)[2]))
-  } else {
+    theta.Q <- diag(rep(theta.prec, dim(basis)[2]))
+  } else if(type=='spde') {
     # SPDE precision
-    prob.th <- seq(0, 1,, nknot)
+    prob.th <- seq(0, 1,length.out = nknot)
     xk.th <- as.vector(quantile(x, prob=prob.th))
-    xk.mesh = inla.mesh.1d(xk.th)	
+    xk.mesh = inla.mesh.1d(xk.th)
     basis <- as.matrix(inla.mesh.1d.A(xk.mesh, xx, method='linear'))
     
     ## mean and precision for theta
-    theta.mu <- rep(0, dim(basis)[2])	
+    theta.mu <- rep(0, dim(basis)[2])
     xk.fem = inla.mesh.1d.fem(xk.mesh)
     nk <- xk.mesh$n
     kappa <- 1
-    Hk = -xk.fem$g1; 
-    Bk = Diagonal(nk, Matrix::diag(xk.fem$c0))
-    Bk.inv = Diagonal(nk, 1/Matrix::diag(xk.fem$c0))
-    theta.Q <- theta.prec*(kappa^2*Bk - kappa*(Matrix::t(Hk) + Hk) + Matrix::t(Hk)%*%Bk.inv%*%Hk)
-  } 
+    Hk = -xk.fem$g1;
+    Bk = Diagonal(nk, diag(xk.fem$c0))
+    Bk.inv = Diagonal(nk, 1/diag(xk.fem$c0))
+    theta.Q <- theta.prec*(kappa^2*Bk - kappa*(t(Hk) + Hk) +
+                             t(Hk)%*%Bk.inv%*%Hk)
+  } else{
+    basis <- 1
+    theta.mu <- 0
+    theta.Q <- theta.prec
+  }
   
-  B0 <- cBind(0, basis)
-  B1 <- cBind(0)
-  B2 <- cBind(0)
+  B0 <- cbind(0, basis)
+  B1 <- cbind(0)
+  B2 <- cbind(0)
   
-  spde <- inla.spde2.generic(M0, M1, M2, B0, B1, B2, theta.mu, theta.Q, transform="identity", BLC = B0)
+  
+  spde <- inla.spde2.generic(M0, M1, M2, B0, B1, B2,
+                             theta.mu, theta.Q, transform="identity", BLC = B0)
   
   spde$x.ind <- x.ind
   return(spde)
 }
-
 
 #' Plot credible band for a nonlinear function using ggplot()
 #'
