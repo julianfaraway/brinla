@@ -23,7 +23,12 @@ some are not found in the book and some are experimental.
 
 # Linear Mixed Model Examples
 
-These come from my [Extending Linear Models with R](http://people.bath.ac.uk/jjf23/ELM/index.html) book.
+*See <https://github.com/julianfaraway/rexamples> for updated versions of these
+examples. The estimation procedure in INLA has changed since the output
+in the examples below was produced resulting in some noticeable changes.
+I keep these here for comparison purposes*
+
+These come from my [Extending Linear Models with R](https://julianfaraway.github.io/faraway/ELM/) book.
 I demonstrate these methods for each of the examples in the
 text. You'll need to read the text for more background on datasets and the interpretations
 or you can just look at the help pages for the datasets. I've focussed attention on the
