@@ -1,6 +1,6 @@
 # Bayesian Regression with INLA
 
-A book by [Xiaofeng Wang](https://filer.case.edu/xxw17/), [Ryan Yue](http://zicklin.baruch.cuny.edu/faculty/profiles/yu-ryan-yue) and [Julian Faraway](http://people.bath.ac.uk/jjf23/)
+A book by [Xiaofeng Wang](https://xfw.github.io/), [Ryan Yue](https://zicklin.baruch.cuny.edu/faculty-profile/yu-yue/) and [Julian Faraway](https://julianfaraway.github.io/)
 
 INLA stands for Integrated Nested Laplace Approximations. It is used for fitting 
 [Latent Gaussian models](https://tgmstat.wordpress.com/2013/10/16/latent-gaussian-models-inla/) (LGM). 
